@@ -1,0 +1,32 @@
+{
+  "name": "Iridescent-Vision",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "homepage": "https://github.com/ChenPaulYu/Iridescent-Vision",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --mode development --open",
+    "build": "webpack --mode production",
+    "deploy": "gh-pages -d dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "7.7.2",
+    "@babel/preset-env": "7.7.1",
+    "babel-cli": "6.26.0",
+    "babel-loader": "8.0.6",
+    "babel-preset-env": "1.7.0",
+    "file-loader": "4.3.0",
+    "gh-pages": "2.1.1",
+    "gltf-loader-2": "0.0.3",
+    "gltf-webpack-loader": "1.0.6",
+    "html-webpack-plugin": "3.2.0",
+    "three": "0.110.0",
+    "three-gltf-loader": "1.110.0",
+    "webpack": "4.41.2",
+    "webpack-cli": "3.3.10",
+    "webpack-dev-server": "3.9.0"
+  }
+}
