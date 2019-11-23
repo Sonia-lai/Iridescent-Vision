@@ -45,7 +45,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'threejs-webpack-template',
+            title: 'Iridescent-Vision',
             filename: 'index.html'
         })
     ]
