@@ -11,7 +11,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "bundle.js",
-        publicPath: "/threejs-webpack-template/",
+        publicPath: "/Iridescent-Vision/",
     },
     module: {
         rules: [

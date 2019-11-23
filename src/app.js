@@ -4,7 +4,6 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import maskPath from './models/mask.gltf';
 
 var camera, scene, renderer;
-var mesh
 
 
 init();
@@ -37,9 +36,6 @@ function init() {
     let geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
     let material = new THREE.MeshNormalMaterial();
 
-    mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-    console.log(scene);
 
 
     let loader = new GLTFLoader();
@@ -62,8 +58,6 @@ function init() {
 
 function animate() {
     renderer.render(scene, camera);
-    mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.02;
     requestAnimationFrame(animate);
 
 }
