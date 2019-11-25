@@ -13,6 +13,10 @@ module.exports = {
         filename: "bundle.js",
         publicPath: "/Iridescent-Vision/",
     },
+    devtool: 'inline-source-map',
+    devServer: {
+        contentBase: './dist'
+    },
     module: {
         rules: [
             {
