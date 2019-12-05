@@ -5,7 +5,6 @@ import maskPath from './models/mask.gltf';
 import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
 
-
 var camera, scene, renderer;
 var mesh;
 var mouseLight;
