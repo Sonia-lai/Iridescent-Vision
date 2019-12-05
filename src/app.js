@@ -3,11 +3,13 @@ import GLTFLoader from 'three-gltf-loader';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import maskPath from './models/mask.gltf';
 import { MouseLight } from './MouseLight';
+import { GlassSkin } from './GlassSkin';
+
 
 var camera, scene, renderer;
 var mesh;
 var mouseLight;
-var cubeCamera;
+var glassSkin;
   
 init();
 animate();
@@ -18,7 +20,6 @@ function init() {
     let height = window.innerHeight
     
     scene = new THREE.Scene();
-    useSkybox();
 
     //scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
@@ -31,7 +32,7 @@ function init() {
     let controls = new OrbitControls(camera, renderer.domElement)
 
     let directionalLight = new THREE.DirectionalLight(0xffffff, 7);
-    //scene.add(directionalLight);
+    scene.add(directionalLight);
 
     let geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
     let material = new THREE.MeshNormalMaterial();
@@ -60,8 +61,6 @@ function init() {
                 //mesh = new THREE.Mesh( child.geometry, cubeMaterial3 );
                 mesh = child;
                 scene.add(mesh);
-                
-                setGlassMaterial();
             }
         })
         
@@ -73,57 +72,32 @@ function init() {
     
 
     document.body.appendChild(renderer.domElement);
-    mouseLight = new MouseLight(scene, camera);
-    mouseLight.enable();
+    
+    testEvent();
 }
 
 function animate() {
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
-    if (!mesh) return;
-    //mesh.setVisible( false );
-    if (cubeCamera) {
-        mesh.visible = false;
-        cubeCamera.position.copy( mesh.position );
-        cubeCamera.update( renderer, scene );
-        mesh.visible = true;
-    }
-    mouseLight.update(mesh);
+
+    if (glassSkin) glassSkin.update(renderer);
+    if (mouseLight) mouseLight.update(mesh);
 }
 
-function useSkybox() {
-    var r = "./";
-    var url_temp = [
-        r + "px.jpg", r + "nx.jpg",
-        r + "py.jpg", r + "ny.jpg",
-        r + "pz.jpg", r + "nz.jpg"
-    ];
-    var urls = [];
-    for (var i=0; i<6; i++) urls.push("");
+function testEvent() {
+    window.addEventListener('keydown', function(e){  
+        var keyID = e.code;
+        
+        if(keyID === 'KeyA')  {
+            mouseLight = new MouseLight(scene, camera);
+            mouseLight.enable();
 
-    var context = require.context('./textures/Park3Med/', true, /\.(jpg)$/);
-    context.keys().forEach((filename)=>{
-        let idx = url_temp.indexOf(filename);
-        if (idx !== -1) {
-            urls[idx] = context(filename);
+            glassSkin = new GlassSkin(scene, mesh);
+            glassSkin.addTestBackground();
+            
+            e.preventDefault();
         }
-    });
-    console.log('url', urls);
-    //var r = "textures/cube/Park3Med/";
-    var textureCube = new THREE.CubeTextureLoader().load( urls );
-    textureCube.mapping = THREE.CubeRefractionMapping;
-    scene.background = textureCube;
+    }, false);
+
 }
 
-function setGlassMaterial() {
-
-    cubeCamera = new THREE.CubeCamera(1, 100, 256); 
-    scene.add(cubeCamera);
-
-    cubeCamera.renderTarget.texture.mapping = THREE.CubeRefractionMapping;
-    var cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.93} );
-    var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.98, reflectivity: 0.9 } );
-    var cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.98, reflectivity: 0.5} );
-
-    mesh.material = cubeMaterial1;
-}
