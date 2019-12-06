@@ -2,9 +2,7 @@ import * as THREE from 'three';
 import GLTFLoader from 'three-gltf-loader';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import maskPath from './models/mask.gltf';
-import testModel from './models/mask.gltf';
 import { SoftVolume } from './SoftVolume';
-import { defaultCipherList } from 'constants';
 
 var camera, scene, renderer;
 var softVolume;
@@ -51,7 +49,7 @@ function init() {
 
 
     let loader = new GLTFLoader();
-    loader.load( testModel, gltf => {
+    loader.load( maskPath, gltf => {
         var model = gltf.scene
         console.log('model', model);
         // model.scale.set(0.008, 0.008, 0.008)
@@ -68,23 +66,21 @@ function init() {
                 scene.add(child);
                 mesh = child;
                 softVolume = new SoftVolume(scene, mesh, true);
+                softVolume.effectRange = 0.5;
+                softVolume.setGUI();
             }
         })
                 
     })
-    // let MeshMaterial = new THREE.MeshPhongMaterial( {
-    //     color: 0xaa2949,
-    //     specular: 0x030303,
-    //     //map: texture1,
-    //     side: THREE.DoubleSide,
-    //     alphaTest: 0.7
-        
-    // } );
+    
+    
     // geometry = new THREE.SphereGeometry(100, 50, 50);
     // geometry.translate(0,0,-200);
     // mesh = new THREE.Mesh( geometry );
     // scene.add(mesh);
     // softVolume = new SoftVolume(scene, mesh, false);
+    // softVolume.effectRange = 10;
+    // softVolume.setGUI();
     
     //console.log(mesh);
     
