@@ -5,26 +5,33 @@ import { Vector3, Mesh } from 'three/build/three.module';
 import * as dat from 'dat.gui';
 
 
-var SoftVolume = function(scene, mesh, gltf) {
+var SoftVolume = function(scene, mesh, isGltf) {
+    
+    //public variable
     this.scene = scene;
     this.mesh = mesh;
-    this.gltf = gltf;
+    this.isGltf = isGltf;
 
-    this.PULL = 7.5; //7.5
-    this.TIMESTEP = 60 / 1000; //18/1000
-    this.mass = 0.1;
-    this.effectRange = 10;
-    this.DRAG = 0.97; //0.97
-    this.BACKDRAG = 0.6;
-    this.mult = 7;
-    this.plane = -2;
-    this.constraintRate = 0.7;
-    this.constraintTime = 5;
+    this.enable = true;
 
-    var TIMESTEP_SQ = this.TIMESTEP * this.TIMESTEP * 10;
+    this.pull = 8.5; //7.5
+    this.drag = 0.97; //0.97
+    this.backdrag = 0.6;
+    this.timestep = 40 / 1000; //18/1000
+    
+    this.effectRange = 2.5;
+    this.depressRate = 4;
+    
+    this.pullTo = -2;
+    this.constraintTime = 3;
+    this.timeoutms = 4000;
+    
+    //private variable
+    let timesq = this.timestep * this.timestep * 10;
     let particles = [];
     let constraints = [];
     let helper;
+    let mass = 0.1;
 
     let firstClick = false;
     let click = false;
@@ -36,13 +43,73 @@ var SoftVolume = function(scene, mesh, gltf) {
     
     let timeout = undefined;
 
+
+    //public function
+    this.update = (camera) => {
+
+        if (!this.enable) return;
+        updateMouse(camera);
+        if (!firstClick) return;
+        simulate();
+        updateMeshPos();
+        if (helper !== undefined) helper.update();
+    }
+
+    this.setGUI = () => {
+        var gui = new dat.GUI();
+        gui.add(this, 'pull').min(0).step(0.1);
+        gui.add(this, 'timestep');
+        gui.add(this, 'effectRange');
+        gui.add(this, 'depressRate');
+        gui.add(this, 'pullTo');
+        gui.add(this, 'constraintTime');
+        gui.add(this, 'timeoutms');
+        let drag = gui.add(this, 'drag');
+        let backdrag = gui.add(this, 'backdrag');
+        drag.onFinishChange(function(value) {
+            //console.log('changed!');
+            for (let i=0; i<particles.length; i++) {
+                particles[i].DRAG = value;
+            }
+        });
+        backdrag.onFinishChange(function(value) {
+            for (let i=0; i<particles.length; i++) {
+                particles[i].BACKDRAG = value;
+            }
+        });
+    }
+    
+    this.computeNormal = () => {
+        this.mesh.geometry.computeVertexNormals();
+    }
+
+    this.dispose = () => {
+        document.removeEventListener( 'mousemove', onMouseMove, false );
+        document.removeEventListener( 'mouseup', onMouseUp, false );
+        document.removeEventListener( 'mousedown', onMouseDown, false );
+        document.removeEventListener( 'mouseout', onMouseOut, false );
+    }
+
+    //private function
+
+    let initMesh = () => {
+        let geometry = new THREE.SphereGeometry(100, 50, 50);
+        geometry.translate(0,0,-200);
+        this.mesh = new THREE.Mesh( geometry );
+        this.scene.add(this.mesh);
+        this.pullTo = 100;
+        this.timestep = 18/1000;
+        this.backdrop = 0.9;
+        this.effectRange = 10;
+    }
+
     let init = () => {
         let geo = this.mesh.geometry;
         //console.log(geo);
         let vertices = geo.attributes.position.array;
         
         for (let i = 0; i < vertices.length; i++) {
-            particles.push( new Particle( vertices[i], vertices[++i], vertices[++i], this.mass));
+            particles.push( new Particle( vertices[i], vertices[++i], vertices[++i], mass));
         }
 
         let faces = geo.index.array;
@@ -72,8 +139,8 @@ var SoftVolume = function(scene, mesh, gltf) {
     }
 
     let initGeo = () => {
+        let geometry = this.mesh.geometry;
 
-        let geometry = mesh.geometry;
         for (var i = 0; i < geometry.vertices.length; i++) {
             var t = geometry.vertices[i];
             particles.push( new Particle( t.x, t.y, t.z, this.mass) );
@@ -103,11 +170,13 @@ var SoftVolume = function(scene, mesh, gltf) {
         var texture = textureLoader.load( "https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png" );
 
         let MeshMaterial = new THREE.MeshPhongMaterial( {
-            color: 0xaa2949,
-            specular: 0x030303,
+            color: 0x12aaf7,
+            emissive: 0xc325e,
+            specular: 0x441833,
             map: texture,
             side: THREE.DoubleSide,
-            alphaTest: 0.7
+            alphaTest: 0.7,
+            shininess: 30,
             
         } );
         
@@ -115,19 +184,9 @@ var SoftVolume = function(scene, mesh, gltf) {
 
     }
 
-    this.update = (camera) => {
-
-        updateMouse(camera);
-        if (!firstClick) return;
-        simulate();
-        updateMeshPos();
-        if (helper !== undefined) helper.update();
-    }
-
-
     let updateMeshPos = () => {
         //clone particle position to mesh
-        if (!this.gltf) {
+        if (!this.isGltf) {
             for ( var i = 0, il = particles.length; i < il; i ++ ) {
                 this.mesh.geometry.vertices[ i ].copy( particles[ i ].position );
             }
@@ -138,7 +197,7 @@ var SoftVolume = function(scene, mesh, gltf) {
                 this.mesh.geometry.attributes.position.array[ i*3+2 ] = particles[ i ].position.z;
             }
         }
-        if (this.gltf)
+        if (this.isGltf)
             this.mesh.geometry.attributes.position.needsUpdate = true;
 
         this.mesh.geometry.computeFaceNormals();
@@ -151,15 +210,15 @@ var SoftVolume = function(scene, mesh, gltf) {
     }
 
     let simulate = () => {
-        TIMESTEP_SQ = this.TIMESTEP * this.TIMESTEP * 10;
+        timesq = this.timestep * this.timestep * 10;
         let i, il;
         for (i = 0, il = particles.length; i < il; i ++ ) {
     
             let particle = particles[ i ];
     
             let force = new THREE.Vector3().copy ( particle.original );
-            particle.addForce( force.sub(particle.position).multiplyScalar( this.PULL ) );
-            particle.integrate( TIMESTEP_SQ );
+            particle.addForce( force.sub(particle.position).multiplyScalar( this.pull ) );
+            particle.integrate( timesq );
             
         }
         
@@ -183,11 +242,12 @@ var SoftVolume = function(scene, mesh, gltf) {
             if ( click && psel ) {
                 let offset = mouse3d.clone().sub(particles[ psel ].position);
                 let offsetOri = mouse3d.distanceTo(particles[ psel ].original);
+                //console.log(offsetOri);
                 for ( i = 0; i < particles.length; i++ ) {
                     let distance = particles[psel].original.distanceTo( particles[i].original );
                     //TODO: calculate distance threshold, mult change with offset
-                    if ( particles[i].distance+0.*distance < this.effectRange) {
-                        let tmp = 1.0 - this.mult*offsetOri*(particles[i].distance/10);
+                    if ( particles[i].distance < this.effectRange) {
+                        let tmp = 1.0 - this.depressRate*(particles[i].distance/10);
                         tmp = Math.max(tmp, 0);
                         tmp = Math.min(tmp, 1);
                         particles[ i ].position.add( offset.clone().multiplyScalar(tmp) );
@@ -200,14 +260,15 @@ var SoftVolume = function(scene, mesh, gltf) {
     
     }
 
-    let diff = new THREE.Vector3();
+    
     let satisfyConstraints = ( p1, p2, distance ) => {
-
+        
+        let diff = new THREE.Vector3();
         diff.subVectors( p2.position, p1.position );
         let currentDist = diff.length();
         if ( currentDist === 0 ) return; // prevents division by 0
         let correction = diff.multiplyScalar( 1 - distance / currentDist );
-        let correctionHalf = correction.multiplyScalar( this.constraintRate );
+        let correctionHalf = correction.multiplyScalar( 0.5 );
         p1.position.add( correctionHalf );
         p2.position.sub( correctionHalf );
 
@@ -249,9 +310,9 @@ var SoftVolume = function(scene, mesh, gltf) {
         }
         //TODO: plane depth calculate?
         let tmpmouse = new Vector3();
-        let newPlane = new THREE.Plane( camera.position.clone().normalize(), this.plane);
+        let newPlane = new THREE.Plane( camera.position.clone().normalize(), this.pullTo);
         raycaster.ray.intersectPlane( newPlane, tmpmouse );
-        // let newSphere = new THREE.Sphere( this.mesh.position.clone(), this.plane);
+        // let newSphere = new THREE.Sphere( this.mesh.position.clone(), this.pullTo);
         // raycaster.ray.intersectSphere (newSphere, tmpmouse);
         if ( tmpmouse != null ) {
             mouse3d.copy(tmpmouse);
@@ -283,53 +344,25 @@ var SoftVolume = function(scene, mesh, gltf) {
             if (click && psel) waitForFinished();
             click = false;
             psel = undefined;
-            
+
         }
     }
     
-    let waitForFinished = function () {
-        //console.log('waitForFinished');
-        timeout = setTimeout(() => {setFirstClick(false)}, 2000);
+    let waitForFinished = () => {
+        timeout = setTimeout(() => {setFirstClick(false)}, this.timeoutms);
     }
 
     let setFirstClick = function(bool) {
         if (bool) {
             if (timeout) clearTimeout(timeout);
         }
-        //console.log('setFirstClick', bool);
         firstClick = bool;
     }
 
-    this.setGUI = () => {
-        var gui = new dat.GUI();
-        gui.add(this, 'PULL').min(0).step(0.1);
-        gui.add(this, 'TIMESTEP');
-        gui.add(this, 'effectRange');
-        gui.add(this, 'mass');
-        gui.add(this, 'mult');
-        gui.add(this, 'plane');
-        gui.add(this, 'constraintRate');
-        gui.add(this, 'constraintTime');
-        let drag = gui.add(this, 'DRAG');
-        let backdrag = gui.add(this, 'BACKDRAG');
-        drag.onFinishChange(function(value) {
-            //console.log('changed!');
-            for (let i=0; i<particles.length; i++) {
-                particles[i].DRAG = value;
-            }
-        });
-        backdrag.onFinishChange(function(value) {
-            for (let i=0; i<particles.length; i++) {
-                particles[i].BACKDRAG = value;
-            }
-        });
-    }
-    
-    this.computeNormal = () => {
-        this.mesh.geometry.computeVertexNormals();
-    }
+    // construct code here
 
-    if (this.gltf) init();
+    if (this.mesh == null) initMesh();
+    if (this.isGltf) init();
     else initGeo();
     changeTexture();
     document.addEventListener( 'mousemove', onMouseMove, false );
@@ -337,6 +370,7 @@ var SoftVolume = function(scene, mesh, gltf) {
     document.addEventListener( 'mousedown', onMouseDown, false );
     document.addEventListener( 'mouseout', onMouseOut, false );
 
-    
 }
+
+
 export {SoftVolume};

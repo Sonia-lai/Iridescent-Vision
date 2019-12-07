@@ -6,7 +6,7 @@ import maskPath2 from './models/MaskUV2.gltf';
 import { SoftVolume } from './SoftVolume';
 
 var camera, scene, renderer;
-var softVolume;
+var softVolume, softVolume1;
 var mesh;
 var controls;
 
@@ -27,7 +27,6 @@ function init() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setClearColor('#FFFFFF');
-
     
     //controls = new OrbitControls(camera, renderer.domElement);
     // controls.enableDamping = true;
@@ -40,97 +39,46 @@ function init() {
     // //controls.target.y = 0;
     // controls.update();
 
-    let directionalLight = new THREE.DirectionalLight(0xffffff, 7);
+    let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(-1,-0.4,1);
     scene.add(directionalLight);
+    scene.add(new THREE.DirectionalLight(0xffffff, 0.5));
 
-    let amblight = new THREE.AmbientLight( 0x999999 ); // soft white light
-    scene.add(amblight);
+    // let amblight = new THREE.AmbientLight( 0x999999 ); // soft white light
+    // scene.add(amblight);
 
     let geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
     let material = new THREE.MeshNormalMaterial();
 
-
-
     let loader = new GLTFLoader();
     loader.load( maskPath, gltf => {
         let model = gltf.scene
-        console.log('model', model);
-        // model.scale.set(0.008, 0.008, 0.008)
-        // model.position.set(0, -2.5, -0)
-        // model.rotation.set(0, 1.7, 0)
         let flag = false;
-        // let meshes = [];
+
         model.traverse(child => {
             if (flag) return;
             if (child.isMesh) {
                 flag = true;
-                console.log(child.geometry);
+
                 child.geometry.rotateY(1.7);
-                child.geometry.scale(0.008, 0.008, 0.008);
+                child.geometry.scale(0.009, 0.009, 0.009);
                 child.geometry.translate(0, -2.5, -0);
-                // let tempGeo = new THREE.Geometry().fromBufferGeometry(child.geometry);
-                // tempGeo.mergeVertices();
-                // // after only mergeVertices my textrues were turning black so this fixed normals issues
-                // tempGeo.computeVertexNormals();
-                // tempGeo.computeFaceNormals();
 
-                // child.geometry = new THREE.BufferGeometry().fromGeometry(tempGeo);
-
-                var positions = child.geometry.attributes.position.array; 
-                var vertices = []; 
-                for(var i = 0, n = positions.length; i < n; i += 3) { 
-                    var x = positions[i]; 
-                    var y = positions[i + 1]; 
-                    var z = positions[i + 2]; 
-                    vertices.push(new THREE.Vector3(x, y, z)); 
-                } 
-                var faces = []; 
-                for(var i = 0, n = vertices.length; i < n; i += 3) { 
-                    //faces.push(new THREE.Face3(i, i + 1, i + 2)); 
-                } 
-
-                let idx = child.geometry.index.array;
-                for (let i = 0; i < idx.length; i+=3 ) {
-                    faces.push(new THREE.Face3(idx[i], idx[i + 1], idx[i + 2])); 
-                }
-                console.log(vertices, faces);
-
-                var geometry = new THREE.Geometry(); 
-                geometry.vertices = vertices; 
-                geometry.faces = faces; 
-                geometry.computeFaceNormals();    
-                geometry.mergeVertices() 
-                geometry.computeVertexNormals(); 
-                child.geometry = geometry;
-                // meshes.push(child.geometry)
                 scene.add(child);
-                console.log(child.geometry);
+
                 mesh = child;
-                softVolume = new SoftVolume(scene, mesh, false);
-                softVolume.effectRange = 0.5;
+                softVolume = new SoftVolume(scene, mesh, true);
                 softVolume.setGUI();
                 softVolume.computeNormal();
             }
-        })
-
-        // mesh = new THREE.BufferGeometryUtils.mergeBufferGeometries(meshes);
-        // scene.add(mesh);     
+        })    
 
         
     })
-    
-    
-    // geometry = new THREE.SphereGeometry(100, 50, 50);
-    // geometry.translate(0,0,-200);
-    // mesh = new THREE.Mesh( geometry );
-    // scene.add(mesh);
-    // softVolume = new SoftVolume(scene, mesh, false);
-    // softVolume.effectRange = 10;
+
+    // softVolume = new SoftVolume(scene, null, false);
     // softVolume.setGUI();
     
-    //console.log(mesh);
-    
-
     document.body.appendChild(renderer.domElement);
 
 }
@@ -138,9 +86,9 @@ function init() {
 function animate() {
     requestAnimationFrame(animate);
     if (softVolume) softVolume.update(camera);
+    if (softVolume1) softVolume1.update(camera);
     //controls.update();
     renderer.render(scene, camera);
-    
     
 }
 

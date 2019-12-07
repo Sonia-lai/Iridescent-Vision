@@ -13,7 +13,7 @@ function Particle( x, y, z, mass ) {
     this.distance = 0;
     this.adj = [];
     this.DRAG = 0.97; //0.97
-    this.BACKDRAG = 0.3;
+    this.BACKDRAG = 0.5;
 
     this.position.set( x, y, z);
     this.previous.set( x, y, z);
