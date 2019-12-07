@@ -1,11 +1,14 @@
 import * as THREE from 'three';
 
-var GlassSkin = function(scene, model) {
+var GlassSkin = function(scene, mesh) {
     
     this.scene = scene;
-    this.model = model;
+    this.mesh = mesh;
 
     let cubeCamera;
+    let enabled = false;
+    let oriMaterial = mesh.material;
+    let cubeMaterial;
 
     let init = () => {
 
@@ -13,19 +16,19 @@ var GlassSkin = function(scene, model) {
         this.scene.add(cubeCamera);
     
         cubeCamera.renderTarget.texture.mapping = THREE.CubeRefractionMapping;
-        var cubeMaterial1 = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.93} );
+        cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.93} );
         var cubeMaterial2 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.98, reflectivity: 0.5} );
         var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0xccddff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.98, reflectivity: 0.9 } );
     
-        this.model.material = cubeMaterial1;
+        this.mesh.material = cubeMaterial;
     }
     
     this.update = (renderer) => {
-
-        this.model.visible = false;
-        cubeCamera.position.copy( this.model.position );
+        if (!enabled) return;
+        this.mesh.visible = false;
+        cubeCamera.position.copy( this.mesh.position );
         cubeCamera.update( renderer, this.scene );
-        this.model.visible = true;
+        this.mesh.visible = true;
     }
 
     this.addTestBackground = () => {
@@ -48,6 +51,23 @@ var GlassSkin = function(scene, model) {
 
         var textureCube = new THREE.CubeTextureLoader().load( urls );
         this.scene.background = textureCube;
+    }
+
+    this.enable = () => {
+        enabled = true;
+        this.mesh.material = cubeMaterial;
+    }
+
+    this.disable = () => {
+        enabled = false;
+        this.scene.background = undefined;
+        this.mesh.material = oriMaterial;
+    }
+
+    this.dispose = () => {
+        this.scene.background = undefined;
+        this.mesh.material = oriMaterial;
+        this.scene.remove(CubeCamera);
     }
 
     init();

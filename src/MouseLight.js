@@ -16,7 +16,7 @@ var MouseLight = function (scene, camera) {
     let raycaster = new THREE.Raycaster();
     let mouse = {x:0, y:0}
     let count = 0;
-    let update = false;
+    let enabled = false;
 
     let initLight = () => {
         light = new THREE.SpotLight( 0xffffff, this.initIntensity);
@@ -39,7 +39,7 @@ var MouseLight = function (scene, camera) {
     }
     
     this.update = (mesh) => {
-        if (!update) return;
+        if (!enabled) return;
 
         light.position.copy(this.camera.position);
 
@@ -61,11 +61,14 @@ var MouseLight = function (scene, camera) {
     }
 
     this.enable = () => {
-        update = true;
+        enabled = true;
+        light.initIntensity = this.initIntensity;
     }
 
     this.disable = () => {
-        update = false;
+        enabled = false;
+        target.position.copy(new Vector3(-1000,-1000,-1000));
+        light.intensity = 0;
     }
 
     this.dispose = () => {

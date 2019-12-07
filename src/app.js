@@ -4,12 +4,17 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import maskPath from './models/mask.gltf';
 import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
+import { SoftVolume } from './SoftVolume';
+import * as dat from 'dat.gui';
 
 var camera, scene, renderer;
-var mesh;
-var mouseLight;
-var glassSkin;
-  
+
+var mesh; //model mesh
+var mouseLight, glassSkin; // use for transparent effect
+var softVolume; // use for softvolume effect
+var controls;
+var directionalLight;
+
 init();
 animate();
 
@@ -20,53 +25,42 @@ function init() {
     
     scene = new THREE.Scene();
 
-    //scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
     camera.position.set(0, 0, 4);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setClearColor('#FFFFFF');
+    
+    // move controls to global for furthur disable
+    controls = new OrbitControls(camera, renderer.domElement)
 
-    let controls = new OrbitControls(camera, renderer.domElement)
+    //let directionalLight = new THREE.DirectionalLight(0xffffff, 7);
 
-    let directionalLight = new THREE.DirectionalLight(0xffffff, 7);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(-1,-0.4,1);
     scene.add(directionalLight);
-
-    let geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-    let material = new THREE.MeshNormalMaterial();
+    scene.add(new THREE.DirectionalLight(0xffffff, 0.5));
 
     let loader = new GLTFLoader();
-    // loader.load( maskPath, gltf => {
-    //     var model = gltf.scene
-    //     model.scale.set(0.008, 0.008, 0.008)
-    //     model.position.set(3, -2.5, 0)
-    //     //model.rotation.set(0, 1.7, 0)
-        
-    //     scene.add(gltf.scene);
-    //     console.log(scene);
-    // })
 
     loader.load( maskPath, gltf => {
-        var model = gltf.scene
-        // model.scale.set(0.008, 0.008, 0.008)
-        // model.position.set(0, -2.5, -0)
-        model.rotation.set(0, 1.7, 0)
+        let model = gltf.scene
+
+        // move scene add model inside traverse
         model.traverse(child => {
             if (child.isMesh) {
-                child.geometry.scale(0.008, 0.008, 0.008)
+                // TODO: ensure gltf file has only one mesh child!
+                child.geometry.rotateY(1.7);
+                child.geometry.scale(0.009, 0.009, 0.009)
                 child.geometry.translate(0, -2.5, -0)
                 child.geometry.computeVertexNormals();
-                //mesh = new THREE.Mesh( child.geometry, cubeMaterial3 );
+
                 mesh = child;
+                console.log(mesh.material);
                 scene.add(mesh);
             }
         })
-        
-        console.log(model);
-        
-        //scene.add(gltf.scene);
-        //console.log(scene);
     })
     
 
@@ -76,27 +70,76 @@ function init() {
 }
 
 function animate() {
-    renderer.render(scene, camera);
     requestAnimationFrame(animate);
-
+    if (softVolume) softVolume.update(camera);
     if (glassSkin) glassSkin.update(renderer);
     if (mouseLight) mouseLight.update(mesh);
+
+    renderer.render(scene, camera);
+    
 }
+
 
 function testEvent() {
     window.addEventListener('keydown', function(e){  
         var keyID = e.code;
-        
+        console.log(keyID);
         if(keyID === 'KeyA')  {
-            mouseLight = new MouseLight(scene, camera);
-            mouseLight.enable();
-
-            glassSkin = new GlassSkin(scene, mesh);
-            glassSkin.addTestBackground();
-            
+            if (softVolume) softVolume.disable();
+            testTransparent();
             e.preventDefault();
         }
+        if (keyID == 'KeyB') {
+            if (mouseLight) mouseLight.disable();
+            if (glassSkin) glassSkin.disable();
+            testSoft();
+            e.preventDefault();
+        }
+        if (keyID == 'KeyC') {
+            testOrigin();
+            e.preventDefault();
+        }
+
     }, false);
 
 }
 
+function testOrigin() {
+    controls.enabled = true;
+    directionalLight.intensity = 0.5;
+    if (mouseLight) mouseLight.disable();
+    if (glassSkin) glassSkin.disable();
+    if (softVolume) softVolume.disable();
+}
+
+function testTransparent() {
+    controls.enabled = true;
+    directionalLight.intensity = 0;
+    if (!mouseLight)
+        mouseLight = new MouseLight(scene, camera);
+    mouseLight.enable();
+    
+    if (!glassSkin)
+        glassSkin = new GlassSkin(scene, mesh);
+    glassSkin.addTestBackground();
+    glassSkin.enable();
+}
+
+function testSoft() {
+    controls.enabled = false;
+    directionalLight.intensity = 0.5;
+    if (!softVolume) {
+        softVolume = new SoftVolume(scene, mesh, true);
+        let gui = new dat.GUI();
+        softVolume.setGUI(gui);
+    }
+    softVolume.enable();
+}
+
+window.onresize = function () {
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize( w, h );
+};
