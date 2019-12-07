@@ -3,7 +3,6 @@ const path = require("path");
 
 module.exports = {
     entry: "./src/app.js",
-    //entry: "./src/transparent.js",
     performance: {
         hints: false,
         maxEntrypointSize: 512000,
