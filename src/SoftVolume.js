@@ -11,15 +11,15 @@ var SoftVolume = function(scene, mesh, gltf) {
     this.gltf = gltf;
 
     this.PULL = 7.5; //7.5
-    this.TIMESTEP = 30 / 1000; //18/1000
+    this.TIMESTEP = 60 / 1000; //18/1000
     this.mass = 0.1;
     this.effectRange = 10;
     this.DRAG = 0.97; //0.97
     this.BACKDRAG = 0.6;
-    this.mult = 14;
+    this.mult = 7;
     this.plane = -2;
-    this.constraintRate = 0.5;
-    this.constraintTime = 3;
+    this.constraintRate = 0.7;
+    this.constraintTime = 5;
 
     var TIMESTEP_SQ = this.TIMESTEP * this.TIMESTEP * 10;
     let particles = [];
@@ -67,8 +67,6 @@ var SoftVolume = function(scene, mesh, gltf) {
                 ] );
             }
         }
-
-        geo.computeVertexNormals();
         // helper = new THREE.VertexNormalsHelper( this.mesh, 10, 0x00ff00, 1 );
         //this.scene.add(helper);
     }
@@ -193,7 +191,7 @@ var SoftVolume = function(scene, mesh, gltf) {
                         tmp = Math.max(tmp, 0);
                         tmp = Math.min(tmp, 1);
                         particles[ i ].position.add( offset.clone().multiplyScalar(tmp) );
-                    } 
+                    }
                 }
             }
     
@@ -325,6 +323,10 @@ var SoftVolume = function(scene, mesh, gltf) {
                 particles[i].BACKDRAG = value;
             }
         });
+    }
+    
+    this.computeNormal = () => {
+        this.mesh.geometry.computeVertexNormals();
     }
 
     if (this.gltf) init();
