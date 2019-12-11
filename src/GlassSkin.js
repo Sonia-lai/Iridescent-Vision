@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Vector3 } from 'three/build/three.module';
 
 var GlassSkin = function(scene, mesh) {
     
@@ -23,10 +24,11 @@ var GlassSkin = function(scene, mesh) {
         this.mesh.material = cubeMaterial;
     }
     
-    this.update = (renderer) => {
+    this.update = (renderer, camera) => {
         if (!enabled) return;
         this.mesh.visible = false;
-        cubeCamera.position.copy( this.mesh.position );
+        //let disVec = this.mesh//this.mesh.position.clone().add(camera.position.clone().multiplyScalar(0.1))
+        cubeCamera.position.copy( camera.position );
         cubeCamera.update( renderer, this.scene );
         this.mesh.visible = true;
     }

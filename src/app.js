@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import GLTFLoader from 'three-gltf-loader';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import maskPath from './models/mask.gltf';
+import headPath from './models/Taj.gltf';
+import headTexture from './textures/TajSkin.png';
 import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
 import { SoftVolume } from './SoftVolume';
@@ -37,7 +39,7 @@ function init() {
 
     //let directionalLight = new THREE.DirectionalLight(0xffffff, 7);
 
-    directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 2);
     directionalLight.position.set(-1,-0.4,1);
     scene.add(directionalLight);
     scene.add(new THREE.DirectionalLight(0xffffff, 0.5));
@@ -51,7 +53,7 @@ function init() {
         model.traverse(child => {
             if (child.isMesh) {
                 // TODO: ensure gltf file has only one mesh child!
-                child.geometry.rotateY(1.7);
+                child.geometry.rotateY(Math.PI/2 + 0.2);
                 child.geometry.scale(0.009, 0.009, 0.009)
                 child.geometry.translate(0, -2.5, -0)
                 child.geometry.computeVertexNormals();
@@ -61,6 +63,44 @@ function init() {
                 scene.add(mesh);
             }
         })
+    })
+
+    let MeshMaterial = new THREE.MeshPhongMaterial( {
+        color: 0xffffff,
+        // emissive: 0xc325e,
+        // specular: 0x441833,
+        map: headTexture,
+        side: THREE.DoubleSide,
+        alphaTest: 0.7,
+        shininess: 30,
+        
+    } );
+
+    var textureLoader = new THREE.TextureLoader();
+    var texture = textureLoader.load(headTexture);
+    loader.load( headPath, gltf => {
+        let model = gltf.scene;
+        model.position.set(0.1, -0.5, -1.7);
+        model.scale.set(0.009, 0.009, 0.009);
+        model.rotation.set(0, Math.PI, 0);
+        //console.log(model);
+        //model.material.flatShading = true;
+        
+        // move scene add model inside traverse
+        // model.traverse(child => {
+        //     if (child.isMesh) {
+        //         // TODO: ensure gltf file has only one mesh child!
+        //         // child.geometry.rotateY(1.7);
+        //         // child.geometry.scale(0.009, 0.009, 0.009)
+        //         // child.geometry.translate(0, -2.5, -0)
+        //         child.material.map = texture;
+        //         //child.material = MeshMaterial;
+        //         child.material.flatShading = true;
+        //         // mesh = child;
+        //         // scene.add(mesh);
+        //     }
+        // })
+        scene.add(model);
     })
     
 
@@ -72,7 +112,7 @@ function init() {
 function animate() {
     requestAnimationFrame(animate);
     if (softVolume) softVolume.update(camera);
-    if (glassSkin) glassSkin.update(renderer);
+    if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
 
     renderer.render(scene, camera);
@@ -114,7 +154,7 @@ function testOrigin() {
 
 function testTransparent() {
     controls.enabled = true;
-    directionalLight.intensity = 0;
+    directionalLight.intensity = 1;
     if (!mouseLight)
         mouseLight = new MouseLight(scene, camera);
     mouseLight.enable();
