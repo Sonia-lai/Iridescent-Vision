@@ -3,7 +3,6 @@ import GLTFLoader from 'three-gltf-loader';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import maskPath from './models/mask.gltf';
 import headPath from './models/Taj.gltf';
-import headTexture from './textures/TajSkin.png';
 import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
 import { SoftVolume } from './SoftVolume';
@@ -76,30 +75,11 @@ function init() {
         
     } );
 
-    var textureLoader = new THREE.TextureLoader();
-    var texture = textureLoader.load(headTexture);
     loader.load( headPath, gltf => {
         let model = gltf.scene;
         model.position.set(0.1, -0.5, -1.7);
         model.scale.set(0.009, 0.009, 0.009);
         model.rotation.set(0, Math.PI, 0);
-        //console.log(model);
-        //model.material.flatShading = true;
-        
-        // move scene add model inside traverse
-        // model.traverse(child => {
-        //     if (child.isMesh) {
-        //         // TODO: ensure gltf file has only one mesh child!
-        //         // child.geometry.rotateY(1.7);
-        //         // child.geometry.scale(0.009, 0.009, 0.009)
-        //         // child.geometry.translate(0, -2.5, -0)
-        //         child.material.map = texture;
-        //         //child.material = MeshMaterial;
-        //         child.material.flatShading = true;
-        //         // mesh = child;
-        //         // scene.add(mesh);
-        //     }
-        // })
         scene.add(model);
     })
     
