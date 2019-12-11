@@ -55,7 +55,8 @@ function init() {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-    camera.position.set(0, 50, 50);
+    //camera.position.set(0, 50, 50);
+    camera.position.set(0, 0, 4);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
@@ -79,8 +80,8 @@ function init() {
             if (child.isMesh) {
                 // TODO: ensure gltf file has only one mesh child!
                 child.geometry.rotateY(1.7);
-                child.geometry.scale(0.05, 0.05, 0.05)
-                child.geometry.translate(0, 10, 0)
+                child.geometry.scale(0.009, 0.009, 0.009)
+                child.geometry.translate(0, -2.5, 0)
                 child.geometry.computeVertexNormals();
 
                 mesh = child;
@@ -131,12 +132,18 @@ function testEvent() {
             testBackground();
             e.preventDefault();
         }
+        if (keyID == 'KeyE') {
+            camera.position.x += 1;
+            mesh.position.z -= 1;
+            e.preventDefault();
+        }
 
     }, false);
 
 }
 
 function testBackground() {
+    controls.enabled = false;
     if (!background) {
         background = new Background(renderer, scene);  
         console.log(background)

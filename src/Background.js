@@ -6,7 +6,7 @@ var Background = function (renderer, scene) {
     let textureLoader = new THREE.TextureLoader()
     let brightness = 0.5
     let fogDistance = 720
-    let speed  = 0.5
+    let speed  = 0.1
     let bldgs  = []
     let debris = []
     let debrisIdealSet = []
@@ -146,9 +146,9 @@ var Background = function (renderer, scene) {
             });
         ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = -0.5 * Math.PI;
-        ground.position.set(0, 0, zMove);
+        ground.position.set(0, -10, zMove);
         ground.receiveShadow = true;
-        // this.scene.add(ground);
+        this.scene.add(ground);
     }
 
 
@@ -162,9 +162,9 @@ var Background = function (renderer, scene) {
     }
 
     function backgroundUpdate(camera, mesh) {
-        let delta = camera.position.z < -chunkSize ? -chunkSize : speed;
-        camera.position.z -= delta
-        mesh.position.z -= delta
+        let delta = camera.position.z > chunkSize ? -chunkSize : speed;
+        camera.position.z += delta
+        mesh.position.z += delta
 
         for (var d of debris) {
             if (d.mesh.position.y >= chunkSize * debrisMaxChunkAscend)
