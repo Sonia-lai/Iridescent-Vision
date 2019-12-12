@@ -143,7 +143,7 @@ var Background = function (renderer, scene) {
     }
 
     let floorGenerate = (chunkSize, asphaltTexture, zMove) => {
-        var groundGeo = new THREE.PlaneGeometry(chunkSize, chunkSize),
+        var groundGeo = new THREE.PlaneGeometry(chunkSize*5, chunkSize*5),
             groundMat = new THREE.MeshLambertMaterial({
                 color: 0x969696,
                 map: asphaltTexture
@@ -172,7 +172,7 @@ var Background = function (renderer, scene) {
                 this.scene.add(debris[i].mesh)
             }
 
-            // this.scene.add(ground);
+            this.scene.add(ground);
 
             
         }
