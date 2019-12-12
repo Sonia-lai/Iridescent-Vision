@@ -87,7 +87,6 @@ function init() {
                 //testSoft();
                 //testTransparent();
                 // demo();
-                gravity = new Gravity(scene)
                 // gravity.enable()
             }
         })
@@ -133,13 +132,12 @@ function testEvent() {
         }
 
         if (keyID == 'KeyF') {
-            if (gravity) {
-                if (!gravity.enabled) {
-                    gravity.enable()
-                } else{
-                    gravity.disable()
-                }
-
+            if(!gravity) {
+                gravity = new Gravity(scene)
+                gravity.enable()
+            } else {
+                gravity.disable()
+                gravity = undefined
             }
             e.preventDefault();
         }
