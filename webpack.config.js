@@ -11,7 +11,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "bundle.js",
-        publicPath: "/Iridescent-Vision/",
+        publicPath: "/Iridescent-Vision/"
     },
     devtool: 'inline-source-map',
     devServer: {

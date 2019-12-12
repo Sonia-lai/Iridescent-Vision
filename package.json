@@ -14,10 +14,12 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "7.7.2",
+    "@babel/plugin-proposal-class-properties": "7.7.4",
     "@babel/preset-env": "7.7.1",
     "babel-cli": "6.26.0",
     "babel-loader": "8.0.6",
     "babel-preset-env": "1.7.0",
+    "cannon": "0.6.2",
     "file-loader": "4.3.0",
     "gh-pages": "2.1.1",
     "gltf-loader-2": "0.0.3",

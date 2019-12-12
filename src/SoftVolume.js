@@ -292,6 +292,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
     }
 
     let updateMouse = (camera) => {
+        console.log(mouse, camera)
         raycaster.setFromCamera( mouse, camera);
         var intersects = raycaster.intersectObjects([this.mesh], true );
 
@@ -314,7 +315,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
 
             for (let i = 0; i < particles.length; i++ ) {
                 particles[i].distance = particles[psel].original.distanceTo( particles[i].original );
-
+                
                 // let ps = particles[psel].original.clone();
                 // let pi = particles[i].original.clone();
                 // let zDis = Math.abs(ps.z - pi.z);
@@ -328,6 +329,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
         //TODO: plane depth calculate?
         let tmpmouse = new Vector3();
         let newPlane = new THREE.Plane( camera.position.clone().normalize(), this.pullTo);
+        console.log(newPlane)
         raycaster.ray.intersectPlane( newPlane, tmpmouse );
         // let newSphere = new THREE.Sphere( this.mesh.position.clone(), this.pullTo);
         // raycaster.ray.intersectSphere (newSphere, tmpmouse);

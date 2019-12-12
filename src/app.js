@@ -6,6 +6,7 @@ import headPath from './models/Taj.gltf';
 import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
 import { SoftVolume } from './SoftVolume';
+import { Background } from './Background'
 import * as dat from 'dat.gui';
 
 var camera, scene, renderer;
@@ -13,8 +14,11 @@ var camera, scene, renderer;
 var mesh; //model mesh
 var mouseLight, glassSkin; // use for transparent effect
 var softVolume; // use for softvolume effect
+var background;
 var controls;
 var directionalLight;
+
+
 
 init();
 animate();
@@ -27,7 +31,7 @@ function init() {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-    camera.position.set(0, 0, 4);
+    camera.position.set(0, 50, 50);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
@@ -39,6 +43,7 @@ function init() {
     //let directionalLight = new THREE.DirectionalLight(0xffffff, 7);
 
     directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+
     directionalLight.position.set(-1,-0.4,1);
     scene.add(directionalLight);
     scene.add(new THREE.DirectionalLight(0xffffff, 0.5));
@@ -55,6 +60,9 @@ function init() {
                 child.geometry.rotateY(Math.PI/2 + 0.2);
                 child.geometry.scale(0.009, 0.009, 0.009)
                 child.geometry.translate(0, -2.5, -0)
+                // child.geometry.rotateY(1.7);
+                // child.geometry.scale(0.05, 0.05, 0.05)
+                // child.geometry.translate(0, 10, 0)
                 child.geometry.computeVertexNormals();
 
                 mesh = child;
@@ -82,7 +90,6 @@ function init() {
         scene.add(model);
     })
     
-
     document.body.appendChild(renderer.domElement);
     
     testEvent();
@@ -93,7 +100,7 @@ function animate() {
     if (softVolume) softVolume.update(camera);
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
-
+    if (background) background.update(camera, mesh);
     renderer.render(scene, camera);
     
 }
@@ -118,9 +125,24 @@ function testEvent() {
             testOrigin();
             e.preventDefault();
         }
+        if (keyID == 'KeyD') {
+            testBackground();
+            e.preventDefault();
+        }
 
     }, false);
 
+}
+
+function testBackground() {
+    if (!background) {
+        background = new Background(renderer, scene);  
+        console.log(background)
+    } 
+    else {
+        background.disable()
+        background = undefined
+    }
 }
 
 function testOrigin() {
