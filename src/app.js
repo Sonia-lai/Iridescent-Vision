@@ -8,8 +8,6 @@ import { SoftVolume } from './SoftVolume';
 import * as dat from 'dat.gui';
 import * as OIMO from 'oimo';
 import { SceneUtils, MeshStandardMaterial } from 'three/build/three.module';
-//import * as OimoMain from 'oimo/examples/js/main';
-//import * as OimoMain from 'oimo/examples/js/main';
 
 
 
@@ -199,7 +197,7 @@ function demo() {
     // basic geometry body
 
     var i = 500, d, h, w, o;
-    
+    var a = 0
     while( i-- ) {
 
         w = rand(0.1,0.3);
@@ -235,7 +233,8 @@ function demo() {
         o.size = [w];
 
         add( o );
-
+        console.log(a)
+        a++
     }
 
     // world internal loop
