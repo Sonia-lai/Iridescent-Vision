@@ -8,6 +8,7 @@ import { SoftVolume } from './SoftVolume';
 import * as dat from 'dat.gui';
 import * as OIMO from 'oimo';
 import { SceneUtils, MeshStandardMaterial } from 'three/build/three.module';
+import { Gravity } from './Gravity'
 
 
 
@@ -16,6 +17,7 @@ var camera, scene, renderer;
 var mesh; //model mesh
 var mouseLight, glassSkin; // use for transparent effect
 var softVolume; // use for softvolume effect
+var gravity;
 var controls;
 var directionalLight;
 
@@ -84,7 +86,9 @@ function init() {
                 scene.add(mesh);
                 //testSoft();
                 //testTransparent();
-                demo();
+                // demo();
+                gravity = new Gravity(scene)
+                // gravity.enable()
             }
         })
     })
@@ -127,8 +131,23 @@ function testEvent() {
             testOrigin();
             e.preventDefault();
         }
+
+        if (keyID == 'KeyF') {
+            if (gravity) {
+                if (!gravity.enabled) {
+                    gravity.enable()
+                } else{
+                    gravity.disable()
+                }
+
+            }
+            e.preventDefault();
+        }
         if (keyID == 'KeyD') {
-            applyN = true;
+            if(gravity) {
+                gravity.applyN = true
+                console.log(gravity.applyN)
+            }
             e.preventDefault();
         }
 
@@ -232,24 +251,22 @@ function demo() {
         o.type = 'sphere';
         o.size = [w];
 
-        add( o );
-        console.log(a)
-        a++
+        add(o);
     }
 
     // world internal loop
 
     world.postLoop = postLoop;
-    world.play();
+    // world.play();
 
 };
 
-var applyN = false;
+var applyN = true;
 function postLoop () {
     
     var force, m;
     var center = new THREE.Vector3(0, 0, 0);
-    var r = 3;
+    var r = 2.5;
     bodys.forEach( function ( b, id ) {
 
         if( b.type === 1 ){
@@ -262,6 +279,7 @@ function postLoop () {
         }
 
     });
+    console.log(applyN)
     if (applyN) applyN = false;
 }
 
