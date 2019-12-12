@@ -21,8 +21,8 @@ var Background = function (renderer, scene) {
     this.fogDistance = 100;
     this.brightness  = 0.5  
 
-    this.update = (camera, mesh) => {
-        backgroundUpdate(camera, mesh)
+    this.update = (camera, mesh, face) => {
+        backgroundUpdate(camera, mesh, face)
     }
     
     this.disable = () => {
@@ -154,10 +154,12 @@ var Background = function (renderer, scene) {
         }
     }
 
-    let backgroundUpdate = (camera, mesh) => {
+    let backgroundUpdate = (camera, mesh, face) => {
         let delta = camera.position.z > chunkSize ? -chunkSize : this.speed;
-        camera.position.y += delta
-        mesh.position.y   += delta
+
+        camera.position.y += delta;
+        mesh.position.y   += delta;
+        face.position.y   += delta;
 
         for (var d of debris) {
             if (d.mesh.position.y >= chunkSize * debrisMaxChunkAscend)

@@ -11,7 +11,7 @@ import * as dat from 'dat.gui';
 
 var camera, scene, renderer;
 
-var mesh; //model mesh
+var mesh, face; //model mesh
 var mouseLight, glassSkin; // use for transparent effect
 var softVolume; // use for softvolume effect
 var background;
@@ -58,7 +58,7 @@ function init() {
             if (child.isMesh) {
                 // TODO: ensure gltf file has only one mesh child!
                 child.geometry.rotateY(Math.PI/2 + 0.2);
-                child.geometry.scale(0.009, 0.009, 0.009)
+                child.geometry.scale(0.05, 0.05, 0.05)
                 child.geometry.translate(0, -2.5, -0)
                 // child.geometry.rotateY(1.7);
                 // child.geometry.scale(0.05, 0.05, 0.05)
@@ -84,9 +84,10 @@ function init() {
 
     loader.load( headPath, gltf => {
         let model = gltf.scene;
-        model.position.set(0.1, -0.5, -1.7);
-        model.scale.set(0.009, 0.009, 0.009);
+        model.position.set(0.1, 10, -8);
+        model.scale.set(0.04, 0.04, 0.04);
         model.rotation.set(0, Math.PI, 0);
+        face = model
         scene.add(model);
     })
     
@@ -100,7 +101,7 @@ function animate() {
     if (softVolume) softVolume.update(camera);
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
-    if (background) background.update(camera, mesh);
+    if (background) background.update(camera, mesh, face);
     renderer.render(scene, camera);
     
 }
