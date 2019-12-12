@@ -178,9 +178,9 @@ var Background = function (renderer, scene) {
     }
 
     let backgroundUpdate = (camera, mesh) => {
-        let delta = camera.position.z < -chunkSize ? -chunkSize : speed;
-        camera.position.z -= delta
-        mesh.position.z -= delta
+        let delta = camera.position.z > chunkSize ? -chunkSize : speed;
+        camera.position.z += delta
+        mesh.position.z   += delta
 
         for (var d of debris) {
             if (d.mesh.position.y >= chunkSize * debrisMaxChunkAscend)
