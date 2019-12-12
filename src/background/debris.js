@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export default class Debris {
-    constructor(x, y, z, width, height, depth, rotX = 0, rotY = 0, rotZ = 0, bldgColor, scene) {
+    constructor(x, y, z, width, height, depth, rotX = 0, rotY = 0, rotZ = 0, bldgColor) {
 
 
         this.geo = new THREE.CubeGeometry(width, height, depth);
