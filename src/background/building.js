@@ -1,8 +1,33 @@
 import * as THREE from 'three';
+import { throws } from 'assert';
 
 export default class Building {
     constructor(x, y, z, width, height, depth, bldgColor, bldgTexture, scene, rotX = 0, rotY = 0, rotZ = 0) {
-        this.geo = new THREE.CubeGeometry(width / 2, height / 2, depth);
+        function CustomSinCurve(scale) {
+
+            THREE.Curve.call(this);
+
+            this.scale = (scale === undefined) ? 1 : scale;
+
+        }
+
+        CustomSinCurve.prototype = Object.create(THREE.Curve.prototype);
+        CustomSinCurve.prototype.constructor = CustomSinCurve;
+
+        CustomSinCurve.prototype.getPoint = function (t) {
+
+            var tx = t * 3 - 1.5;
+            var ty = Math.sin(2 * Math.PI * t);
+            var tz = 0;
+
+            return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+
+        };
+
+        var path = new CustomSinCurve(10);
+        var geometry = new THREE.TubeGeometry(path, 20, 2, 8, false);
+        this.geo = geometry
+        // this.geo = new THREE.CubeGeometry(width / 2, height / 2, depth);
         this.mat = new THREE.MeshLambertMaterial({
             color: bldgColor,
             map: bldgTexture
@@ -25,6 +50,9 @@ export default class Building {
             this.mesh.rotation.z = rotZ * Math.PI / 180;
         }
         this.mesh.castShadow = true;
-        scene.add(this.mesh);
+
+
+
+        // scene.add(this.mesh);
     }
 }

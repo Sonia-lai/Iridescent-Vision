@@ -26,7 +26,7 @@ var GlassSkin = function(scene, mesh) {
     this.update = (renderer) => {
         if (!enabled) return;
         this.mesh.visible = false;
-        cubeCamera.position.copy( this.mesh.position );
+            cubeCamera.position.copy( this.mesh.position );
         cubeCamera.update( renderer, this.scene );
         this.mesh.visible = true;
     }

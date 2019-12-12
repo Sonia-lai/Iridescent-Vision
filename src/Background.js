@@ -2,13 +2,11 @@ import * as THREE from 'three';
 
 var Background = function (renderer, scene) {
     let ground, ambientLight, hemiLight
-    let enabled = false;
     let textureLoader = new THREE.TextureLoader()
     let brightness = 0.5
-    let fogDistance = 720
+    let fogDistance = 100
     let speed  = 0.5
-    let bldgs  = []
-    let debris = []
+    let bldgs  = [], debris = []
     let debrisIdealSet = []
         
     let asphaltTexture, bldgTexture
@@ -26,13 +24,17 @@ var Background = function (renderer, scene) {
     }
     
     this.disable = () => {
-        debris = []
-        bldgs = []
-        debrisIdealSet = []
-        console.log(ground)
         this.scene.remove(ground);
         this.scene.remove(ambientLight);
         this.scene.remove(hemiLight);
+        for (var i = 0; i < bldgs.length; i++) {
+            this.scene.remove(bldgs[i].mesh)
+        }
+
+        for (var i = 0; i < debris.length; i++) {
+            this.scene.remove(debris[i].mesh)
+        }
+
     }
 
     function randomInt(min, max) {
@@ -48,43 +50,43 @@ var Background = function (renderer, scene) {
 
         return [
             // northwest
-            new Building(-44, 4, -44 + zMove, lgBldgSize, 40, lgBldgSize, bldgColor, bldgTexture, scene, 0, 35, -85),
-            new Building(-56, -2, -32 + zMove, smBldgSize, 52, smBldgSize, bldgColor, bldgTexture, scene, 15, 0, -12),
-            new Building(-36, 0, -16 + zMove, lgBldgSize, 52, lgBldgSize, bldgColor, bldgTexture, scene, 0, 0, -10),
-            new Building(-24, 0, -36 + zMove, smBldgSize, 52, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, -10),
-            new Building(-16, 0, -20 + zMove, smBldgSize, 52, smBldgSize, bldgColor, bldgTexture, scene, 30, 0, 0),
+            new Building(-44, 4, -44 + zMove, lgBldgSize, 40, lgBldgSize, bldgColor, bldgTexture, 0, 35, -85),
+            new Building(-56, -2, -32+ zMove, smBldgSize, 52, smBldgSize, bldgColor, bldgTexture, 15, 0, -12),
+            new Building(-36, 0, -16 + zMove, lgBldgSize, 52, lgBldgSize, bldgColor, bldgTexture, 0, 0, -10),
+            new Building(-24, 0, -36 + zMove, smBldgSize, 52, smBldgSize, bldgColor, bldgTexture, 0, 0, -10),
+            new Building(-16, 0, -20 + zMove, smBldgSize, 52, smBldgSize, bldgColor, bldgTexture, 30, 0, 0),
 
             // northeast
-            new Building(24, -2, -44 + zMove, lgBldgSize, 44, lgBldgSize, bldgColor, bldgTexture, scene, -15, 0, 15),
-            new Building(40, 0, -36 + zMove, smBldgSize, 48, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, 15),
-            new Building(48, 0, -36 + zMove, smBldgSize, 38, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, 12),
-            new Building(20, 0, -24 + zMove, smBldgSize, 40, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, 15),
-            new Building(32, 0, -24 + zMove, smBldgSize, 48, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, 15),
-            new Building(42, 0, -24 + zMove, smBldgSize, 38, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, 15),
-            new Building(48, 2, 1 + zMove, lgBldgSize, 32, lgBldgSize, bldgColor, bldgTexture, scene, 0, -25, 80),
+            new Building(24, -2, -44 + zMove, lgBldgSize, 44, lgBldgSize, bldgColor, bldgTexture, -15, 0, 15),
+            new Building(40, 0, -36 + zMove, smBldgSize, 48, smBldgSize, bldgColor, bldgTexture ,   0, 0, 15),
+            new Building(48, 0, -36 + zMove, smBldgSize, 38, smBldgSize, bldgColor, bldgTexture ,   0, 0, 12),
+            new Building(20, 0, -24 + zMove, smBldgSize, 40, smBldgSize, bldgColor, bldgTexture ,   0, 0, 15),
+            new Building(32, 0, -24 + zMove, smBldgSize, 48, smBldgSize, bldgColor, bldgTexture ,   0, 0, 15),
+            new Building(42, 0, -24 + zMove, smBldgSize, 38, smBldgSize, bldgColor, bldgTexture ,   0, 0, 15),
+            new Building(48, 2, 1 + zMove, lgBldgSize, 32, lgBldgSize, bldgColor, bldgTexture   ,   0, -25, 80),
 
             // southwest
-            new Building(-48, 0, 16 + zMove, smBldgSize, 44, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, -10),
-            new Building(-32, 0, 16 + zMove, smBldgSize, 48, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, -15),
-            new Building(-16, -2, 16 + zMove, smBldgSize, 40, smBldgSize, bldgColor, bldgTexture, scene, -10, 0, -12),
-            new Building(-32, 0, 32 + zMove, lgBldgSize, 48, lgBldgSize, bldgColor, bldgTexture, scene, 0, 0, 15),
-            new Building(-48, 0, 48 + zMove, smBldgSize, 20, smBldgSize, bldgColor, bldgTexture, scene),
-            new Building(-16, 0, 48 + zMove, smBldgSize, 36, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, 15),
-            new Building(-48, 19, 48 + zMove, smBldgSize, 20, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, -15),
+            new Building(-48, 0, 16 + zMove, smBldgSize, 44, smBldgSize, bldgColor, bldgTexture, 0, 0, -10),
+            new Building(-32, 0, 16 + zMove, smBldgSize, 48, smBldgSize, bldgColor, bldgTexture, 0, 0, -15),
+            new Building(-16, -2, 16 + zMove, smBldgSize, 40, smBldgSize, bldgColor, bldgTexture, -10, 0, -12),
+            new Building(-32, 0, 32 + zMove, lgBldgSize, 48, lgBldgSize, bldgColor, bldgTexture,  0, 0, 15),
+            new Building(-48, 0, 48 + zMove, smBldgSize, 20, smBldgSize, bldgColor, bldgTexture),
+            new Building(-16, 0, 48 + zMove, smBldgSize, 36, smBldgSize, bldgColor, bldgTexture,  0, 0, 15),
+            new Building(-48, 19, 48 + zMove, smBldgSize, 20, smBldgSize, bldgColor, bldgTexture, 0, 0, -15),
 
             // southeast
-            new Building(30, 0, 52 + zMove, lgBldgSize, 48, lgBldgSize, bldgColor, bldgTexture, scene, 0, 0, 20),
-            new Building(24, 0, 20 + zMove, smBldgSize, 40, smBldgSize, bldgColor, bldgTexture, scene, 0, 0, 5),
-            new Building(40, 0, 24 + zMove, smBldgSize, 40, smBldgSize, bldgColor, bldgTexture, scene),
-            new Building(24, 0, 32 + zMove, smBldgSize, 36, smBldgSize, bldgColor, bldgTexture, scene),
-            new Building(52, 0, 12 + zMove, smBldgSize, 20, smBldgSize, bldgColor, bldgTexture, scene),
-            new Building(36, 0, 32 + zMove, lgBldgSize, 48, lgBldgSize, bldgColor, bldgTexture, scene, 0, 0, -25)
+            new Building(30, 0, 52 + zMove, lgBldgSize, 48, lgBldgSize, bldgColor, bldgTexture,  0, 0, 20),
+            new Building(24, 0, 20 + zMove, smBldgSize, 40, smBldgSize, bldgColor, bldgTexture,  0, 0, 5),
+            new Building(40, 0, 24 + zMove, smBldgSize, 40, smBldgSize, bldgColor, bldgTexture),
+            new Building(24, 0, 32 + zMove, smBldgSize, 36, smBldgSize, bldgColor, bldgTexture),
+            new Building(52, 0, 12 + zMove, smBldgSize, 20, smBldgSize, bldgColor, bldgTexture),
+            new Building(36, 0, 32 + zMove, lgBldgSize, 48, lgBldgSize, bldgColor, bldgTexture, 0, 0, -25)
         ];
     }
 
     function debrisGenerate(zMove) {
-        var debrisIdealSet = []
-        var debris = []
+        debrisIdealSet = []
+        debris = []
         for (var d = 0; d < debrisPerChunk; ++d) {
             let halfChunk = chunkSize / 2,
                 debrisParams = {
@@ -129,7 +131,7 @@ var Background = function (renderer, scene) {
     }
 
     let lightGenerate = (lightColor, brightness) => {
-        // lighting
+
         ambientLight = new THREE.AmbientLight(lightColor);
         this.scene.add(ambientLight);
 
@@ -148,20 +150,34 @@ var Background = function (renderer, scene) {
         ground.rotation.x = -0.5 * Math.PI;
         ground.position.set(0, 0, zMove);
         ground.receiveShadow = true;
-        // this.scene.add(ground);
+        return ground
     }
 
 
-    function backgroundGenerate(chunkSize, chunksAtATime, asphaltTexture) {
+    let backgroundGenerate = (chunkSize, chunksAtATime, asphaltTexture) => {
         for (var cz = 1; cz > -chunksAtATime; --cz) {
             var zMove = chunkSize * cz;
-            floorGenerate(chunkSize, asphaltTexture, zMove)
-            bldgs = cityGenerate(zMove)
+
+            ground = floorGenerate(chunkSize, asphaltTexture, zMove)
+            bldgs  = cityGenerate(zMove)
+    
             debris = debrisGenerate(zMove)
+
+            for(var i =0;i < bldgs.length;i++) {
+                this.scene.add(bldgs[i].mesh)
+            }
+
+            for (var i = 0; i < debris.length; i++) {
+                this.scene.add(debris[i].mesh)
+            }
+
+            // this.scene.add(ground);
+
+            
         }
     }
 
-    function backgroundUpdate(camera, mesh) {
+    let backgroundUpdate = (camera, mesh) => {
         let delta = camera.position.z < -chunkSize ? -chunkSize : speed;
         camera.position.z -= delta
         mesh.position.z -= delta
@@ -186,15 +202,8 @@ var Background = function (renderer, scene) {
         renderer.setClearColor(new THREE.Color(skyColor));
         renderer.shadowMap.enabled = true;
         backgroundGenerate(chunkSize, chunksAtATime, asphaltTexture)
-
-        ambientLight = new THREE.AmbientLight(lightColor);
-        this.scene.add(ambientLight);
-
-        hemiLight = new THREE.HemisphereLight(lightColor, 0xffffff, brightness);
-        hemiLight.position.set(0, 8, 0);
-        this.scene.add(hemiLight);
-
-        scene.fog = new THREE.Fog(skyColor, 0.01, fogDistance);
+        lightGenerate = (lightColor, brightness)
+        this.scene.fog = new THREE.Fog(skyColor, 0.01, fogDistance);
 
     }
 

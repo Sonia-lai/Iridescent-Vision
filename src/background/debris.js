@@ -15,6 +15,5 @@ export default class Debris {
             rotY * Math.PI / 180,
             rotZ * Math.PI / 180
         );
-        scene.add(this.mesh);
     }
 } 
