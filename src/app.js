@@ -68,7 +68,6 @@ function init() {
         color: 0xffffff,
         // emissive: 0xc325e,
         // specular: 0x441833,
-        map: headTexture,
         side: THREE.DoubleSide,
         alphaTest: 0.7,
         shininess: 30,
