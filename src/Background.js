@@ -3,9 +3,7 @@ import * as THREE from 'three';
 var Background = function (renderer, scene) {
     let ground, ambientLight, hemiLight
     let textureLoader = new THREE.TextureLoader()
-    let brightness = 0.5
-    let fogDistance = 100
-    let speed  = 0.5
+
     let bldgs  = [], debris = []
     let debrisIdealSet = []
         
@@ -18,6 +16,10 @@ var Background = function (renderer, scene) {
     const Building = require('./background/building').default;
 
     this.scene = scene;
+
+    this.speed = 0.5;
+    this.fogDistance = 100;
+    this.brightness  = 0.5  
 
     this.update = (camera, mesh) => {
         backgroundUpdate(camera, mesh)
@@ -160,7 +162,6 @@ var Background = function (renderer, scene) {
 
             ground = floorGenerate(chunkSize, asphaltTexture, zMove)
             bldgs  = cityGenerate(zMove)
-    
             debris = debrisGenerate(zMove)
 
             for(var i =0;i < bldgs.length;i++) {
@@ -178,7 +179,7 @@ var Background = function (renderer, scene) {
     }
 
     let backgroundUpdate = (camera, mesh) => {
-        let delta = camera.position.z > chunkSize ? -chunkSize : speed;
+        let delta = camera.position.z > chunkSize ? -chunkSize : this.speed;
         camera.position.z += delta
         mesh.position.z   += delta
 
@@ -186,24 +187,24 @@ var Background = function (renderer, scene) {
             if (d.mesh.position.y >= chunkSize * debrisMaxChunkAscend)
                 d.mesh.position.y += -chunkSize * debrisMaxChunkAscend;
             else
-                d.mesh.position.y += speed;
+                d.mesh.position.y += this.speed;
 
-            let angleToAdd = speed / chunkSize * (Math.PI * 2);
+            let angleToAdd = this.speed / chunkSize * (Math.PI * 2);
             d.mesh.rotation.x += d.mesh.rotation.x >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
             d.mesh.rotation.y += d.mesh.rotation.y >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
             d.mesh.rotation.z += d.mesh.rotation.z >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
         }
     }
 
-    let initBackground = (renderer, scene) => {
+    let initBackground = (renderer) => {
         asphaltTexture = textureLoader.load("https://i.ibb.co/hVK82BH/asphalt-texture.jpg");
         bldgTexture = textureLoader.load("https://i.ibb.co/ZGLhtGv/building-texture.jpg");
 
         renderer.setClearColor(new THREE.Color(skyColor));
         renderer.shadowMap.enabled = true;
         backgroundGenerate(chunkSize, chunksAtATime, asphaltTexture)
-        lightGenerate = (lightColor, brightness)
-        this.scene.fog = new THREE.Fog(skyColor, 0.01, fogDistance);
+        lightGenerate = (lightColor, this.brightness)
+        this.scene.fog = new THREE.Fog(skyColor, 0.01, this.dfogDistance);
 
     }
 
