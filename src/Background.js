@@ -136,9 +136,9 @@ var Background = function (renderer, scene) {
         for (var cz = 1; cz > -chunksAtATime; --cz) {
             var zMove = chunkSize * cz;
 
-            ground = floorGenerate(chunkSize, asphaltTexture, zMove)
+            // ground = floorGenerate(chunkSize, asphaltTexture, zMove)
             bldgs  = cityGenerate(zMove)
-            debris = debrisGenerate(zMove)
+            // debris = debrisGenerate(zMove)
 
             for(var i =0;i < bldgs.length;i++) {
                 this.scene.add(bldgs[i].mesh)

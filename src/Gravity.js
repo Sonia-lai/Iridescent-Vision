@@ -25,7 +25,7 @@ var Gravity = function (scene) {
     this.applyN = true;
     this.scene  = scene;
     this.enabled = false;
-    this.center = new THREE.Vector3(0, 0, 1000);
+    this.center = new THREE.Vector3(0, 0, 0);
 
 
     let rand = (low, high) => low + Math.random() * (high - low);
@@ -37,7 +37,6 @@ var Gravity = function (scene) {
                 broadphase: 2, // 1: brute force, 2: sweep & prune, 3: volume tree
                 worldscale: 1,
                 random: true,
-                info: false, // display statistique
                 gravity: [0, 0, 0],
             });
     }
@@ -128,8 +127,7 @@ var Gravity = function (scene) {
         world.stop()
     }
 
-    this.update = (position) => {
-        this.center  = position
+    this.update = () => {
         postLoop()
     }
 

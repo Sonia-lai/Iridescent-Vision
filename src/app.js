@@ -38,7 +38,7 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
     // camera.position.set(0, 50, 50);
 
-    camera.position.set(0, 10, 100);
+    camera.position.set(0, 10, 40);
 
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -106,7 +106,7 @@ function animate() {
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
-    if (gravity) gravity.update(mesh.position)   
+    if (gravity) gravity.update()   
     renderer.render(scene, camera);
     
 }
