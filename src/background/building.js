@@ -2,10 +2,10 @@ import * as THREE from 'three';
 import { throws } from 'assert';
 
 export default class Building {
-    constructor(x, y, z, width, height, depth, bldgColor, bldgTexture, rotX = 0, rotY = 0, rotZ = 0) {
+    constructor(x, y, z, width, height, depth, bldgColor, rotX = 0, rotY = 0, rotZ = 0) {
         function CustomSinCurve(scale) {
             THREE.Curve.call(this);
-            this.type = x > -15 ? 1: 0; 
+            this.type = x > -30 ? 1: 0; 
             this.scale = (scale === undefined) ? 1 : scale;
 
         }

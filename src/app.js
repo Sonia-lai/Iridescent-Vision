@@ -117,6 +117,10 @@ function testEvent() {
         var keyID = e.code;
         console.log(keyID);
         if(keyID === 'KeyA')  {
+            if(background) {
+                background.disable()
+                background = undefined
+            }
             if (softVolume) softVolume.disable();
             testTransparent();
             e.preventDefault();
@@ -132,6 +136,8 @@ function testEvent() {
             e.preventDefault();
         }
         if (keyID == 'KeyD') {
+            if (mouseLight) mouseLight.disable();
+            if (glassSkin) glassSkin.disable();
             testBackground();
             e.preventDefault();
         }
@@ -153,11 +159,38 @@ function testEvent() {
             e.preventDefault();
         }
 
+        if (keyID == 'ArrowLeft') {
+            if (background) {
+                background.direction = 'up'
+            }
+            e.preventDefault();
+        }
+        if (keyID == 'ArrowRight') {
+            if (background) {
+                background.direction = 'down'
+            }
+            e.preventDefault();
+        }
+
+        if (keyID == 'ArrowUp') {
+            if (background) {
+                background.direction = 'forward'
+            }
+            e.preventDefault();
+        }
+        if (keyID == 'ArrowDown') {
+            if (background) {
+                background.direction = 'back'
+            }
+            e.preventDefault();
+        }
+
     }, false);
 
 }
 
 function testBackground() {
+    controls.enabled = true;
     if (!background) {
         background = new Background(renderer, scene);  
         console.log(background)
@@ -186,8 +219,10 @@ function testTransparent() {
     
     if (!glassSkin)
         glassSkin = new GlassSkin(scene, mesh);
+    
     glassSkin.addTestBackground();
     glassSkin.enable();
+    
 }
 
 function testSoft() {
