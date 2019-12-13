@@ -9,8 +9,7 @@ var Background = function (renderer, scene) {
         
     let asphaltTexture, bldgTexture
     let bldgColor = 0x242424, lightColor = 0x444444, skyColor = 0xaaaaaa,
-        chunkSize = 200, chunksAtATime = 6, debrisPerChunk = 32, debrisMaxChunkAscend = 10,
-        smBldgSize = 10, lgBldgSize = 12;
+        chunkSize = 200, chunksAtATime = 6, debrisPerChunk = 32, debrisMaxChunkAscend = 10, lgBldgSize = 12;
 
     const Debris = require('./background/debris').default;
     const Building = require('./background/building').default;
@@ -66,7 +65,8 @@ var Background = function (renderer, scene) {
         debrisIdealSet = []
         debris = []
         for (var d = 0; d < debrisPerChunk; ++d) {
-            let halfChunk = chunkSize / 2,
+
+            let halfChunk = chunkSize / 10,
                 debrisParams = {
                     x: randomInt(-halfChunk, halfChunk),
                     y: randomInt(0, chunkSize * debrisMaxChunkAscend),
@@ -144,9 +144,9 @@ var Background = function (renderer, scene) {
                 this.scene.add(bldgs[i].mesh)
             }
 
-            for (var i = 0; i < debris.length; i++) {
-                this.scene.add(debris[i].mesh)
-            }
+            // for (var i = 0; i < debris.length; i++) {
+            //     this.scene.add(debris[i].mesh)
+            // }
 
             // this.scene.add(ground);
 
@@ -155,23 +155,25 @@ var Background = function (renderer, scene) {
     }
 
     let backgroundUpdate = (camera, mesh, face) => {
-        let delta = camera.position.z > chunkSize ? -chunkSize : this.speed;
+        let delta = this.speed;
 
         camera.position.y += delta;
         mesh.position.y   += delta;
         face.position.y   += delta;
+        
 
-        for (var d of debris) {
-            if (d.mesh.position.y >= chunkSize * debrisMaxChunkAscend)
-                d.mesh.position.y += -chunkSize * debrisMaxChunkAscend;
-            else
-                d.mesh.position.y += this.speed;
 
-            let angleToAdd = this.speed / chunkSize * (Math.PI * 2);
-            d.mesh.rotation.x += d.mesh.rotation.x >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
-            d.mesh.rotation.y += d.mesh.rotation.y >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
-            d.mesh.rotation.z += d.mesh.rotation.z >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
-        }
+        // for (var d of debris) {
+        //     if (d.mesh.position.y >= chunkSize * debrisMaxChunkAscend)
+        //         d.mesh.position.y += -chunkSize * debrisMaxChunkAscend;
+        //     else
+        //         d.mesh.position.y += this.speed;
+
+        //     let angleToAdd = this.speed / chunkSize * (Math.PI * 2);
+        //     d.mesh.rotation.x += d.mesh.rotation.x >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
+        //     d.mesh.rotation.y += d.mesh.rotation.y >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
+        //     d.mesh.rotation.z += d.mesh.rotation.z >= Math.PI * 2 ? -Math.PI * 2 : angleToAdd;
+        // }
     }
 
     let initBackground = (renderer) => {
@@ -182,7 +184,7 @@ var Background = function (renderer, scene) {
         renderer.shadowMap.enabled = true;
         backgroundGenerate(chunkSize, chunksAtATime, asphaltTexture)
         lightGenerate(lightColor, this.brightness)
-        this.scene.fog = new THREE.Fog(skyColor, 0.01, this.dfogDistance);
+        this.scene.fog = new THREE.Fog(skyColor, 0  , this.dfogDistance);
 
     }
 

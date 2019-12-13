@@ -37,6 +37,13 @@ var MouseLight = function (scene, camera) {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
+
+    let onTouchMove = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        mouse.x = (event.touches[ 0 ].pageX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
+    }
     
     this.update = (mesh) => {
         if (!enabled) return;
@@ -79,6 +86,8 @@ var MouseLight = function (scene, camera) {
         document.removeEventListener( 'mousemove', onMouseMove, false );
     }
 
+    //TODO: prevent scroll
+    document.addEventListener( 'touchmove', onTouchMove, false );
     document.addEventListener('mousemove', onMouseMove, false);
     initLight();
 }

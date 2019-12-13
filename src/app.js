@@ -8,15 +8,20 @@ import { GlassSkin } from './GlassSkin';
 import { SoftVolume } from './SoftVolume';
 import { Background } from './Background'
 import * as dat from 'dat.gui';
+import { Gravity } from './Gravity'
+
+
 
 var camera, scene, renderer;
 
 var mesh, face; //model mesh
 var mouseLight, glassSkin; // use for transparent effect
 var softVolume; // use for softvolume effect
-var background;
+
+var background, gravity;
 var controls;
 var directionalLight;
+
 
 
 
@@ -31,7 +36,10 @@ function init() {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-    camera.position.set(0, 50, 50);
+    // camera.position.set(0, 50, 50);
+
+    camera.position.set(0, 10, 100);
+
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
@@ -56,21 +64,17 @@ function init() {
         // move scene add model inside traverse
         model.traverse(child => {
             if (child.isMesh) {
-                // TODO: ensure gltf file has only one mesh child!
-                child.geometry.rotateY(Math.PI/2 + 0.2);
-                child.geometry.scale(0.05, 0.05, 0.05)
-                child.geometry.translate(0, -2.5, -0)
-                // child.geometry.rotateY(1.7);
-                // child.geometry.scale(0.05, 0.05, 0.05)
-                // child.geometry.translate(0, 10, 0)
+                child.geometry.rotateY(1.7);
+                child.geometry.scale(0.1, 0.1, 0.1)
+                child.geometry.translate(0, -30, 0)
                 child.geometry.computeVertexNormals();
-
                 mesh = child;
                 console.log(mesh.material);
                 scene.add(mesh);
             }
         })
     })
+
 
     let MeshMaterial = new THREE.MeshPhongMaterial( {
         color: 0xffffff,
@@ -84,8 +88,8 @@ function init() {
 
     loader.load( headPath, gltf => {
         let model = gltf.scene;
-        model.position.set(0.1, 10, -8);
-        model.scale.set(0.04, 0.04, 0.04);
+        model.position.set(2, 0, -15);
+        model.scale.set(0.08, 0.08, 0.08);
         model.rotation.set(0, Math.PI, 0);
         face = model
         scene.add(model);
@@ -102,6 +106,7 @@ function animate() {
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
+    if (gravity) gravity.update(mesh.position)   
     renderer.render(scene, camera);
     
 }
@@ -131,6 +136,23 @@ function testEvent() {
             e.preventDefault();
         }
 
+        if (keyID == 'KeyF') {
+            if(!gravity) {
+                gravity = new Gravity(scene)
+                gravity.enable()
+            } else {
+                gravity.disable()
+                gravity = undefined
+            }
+            e.preventDefault();
+        }
+        if (keyID == 'KeyG') {
+            if(gravity) {
+                gravity.applyN = true
+            }
+            e.preventDefault();
+        }
+
     }, false);
 
 }
@@ -157,6 +179,7 @@ function testOrigin() {
 function testTransparent() {
     controls.enabled = true;
     directionalLight.intensity = 1;
+
     if (!mouseLight)
         mouseLight = new MouseLight(scene, camera);
     mouseLight.enable();
@@ -184,4 +207,4 @@ window.onresize = function () {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize( w, h );
-};
+}
