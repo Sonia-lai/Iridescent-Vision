@@ -29,6 +29,7 @@ var GlassSkin = function(scene, mesh) {
         this.mesh.visible = false;
         //let disVec = this.mesh//this.mesh.position.clone().add(camera.position.clone().multiplyScalar(0.1))
         cubeCamera.position.copy( camera.position );
+
         cubeCamera.update( renderer, this.scene );
         this.mesh.visible = true;
     }

@@ -6,15 +6,24 @@ import headPath from './models/Taj.gltf';
 import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
 import { SoftVolume } from './SoftVolume';
+import { Background } from './Background'
 import * as dat from 'dat.gui';
+import { Gravity } from './Gravity'
+
+
 
 var camera, scene, renderer;
 
-var mesh; //model mesh
+var mesh, face; //model mesh
 var mouseLight, glassSkin; // use for transparent effect
 var softVolume; // use for softvolume effect
+
+var background, gravity;
 var controls;
 var directionalLight;
+
+
+
 
 init();
 animate();
@@ -27,7 +36,10 @@ function init() {
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-    camera.position.set(0, 0, 4);
+    // camera.position.set(0, 50, 50);
+
+    camera.position.set(0, 10, 40);
+
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
@@ -39,6 +51,7 @@ function init() {
     //let directionalLight = new THREE.DirectionalLight(0xffffff, 7);
 
     directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+
     directionalLight.position.set(-1,-0.4,1);
     scene.add(directionalLight);
     scene.add(new THREE.DirectionalLight(0xffffff, 0.5));
@@ -51,12 +64,10 @@ function init() {
         // move scene add model inside traverse
         model.traverse(child => {
             if (child.isMesh) {
-                // TODO: ensure gltf file has only one mesh child!
-                child.geometry.rotateY(Math.PI/2 + 0.2);
-                child.geometry.scale(0.009, 0.009, 0.009)
-                child.geometry.translate(0, -2.5, -0)
+                child.geometry.rotateY(1.7);
+                child.geometry.scale(0.1, 0.1, 0.1)
+                child.geometry.translate(0, -30, 0)
                 child.geometry.computeVertexNormals();
-
                 mesh = child;
                 console.log(mesh.material);
                 scene.add(mesh);
@@ -64,11 +75,11 @@ function init() {
         })
     })
 
+
     let MeshMaterial = new THREE.MeshPhongMaterial( {
         color: 0xffffff,
         // emissive: 0xc325e,
         // specular: 0x441833,
-        map: headTexture,
         side: THREE.DoubleSide,
         alphaTest: 0.7,
         shininess: 30,
@@ -77,13 +88,13 @@ function init() {
 
     loader.load( headPath, gltf => {
         let model = gltf.scene;
-        model.position.set(0.1, -0.5, -1.7);
-        model.scale.set(0.009, 0.009, 0.009);
+        model.position.set(2, 0, -15);
+        model.scale.set(0.08, 0.08, 0.08);
         model.rotation.set(0, Math.PI, 0);
+        face = model
         scene.add(model);
     })
     
-
     document.body.appendChild(renderer.domElement);
     
     testEvent();
@@ -94,7 +105,8 @@ function animate() {
     if (softVolume) softVolume.update(camera);
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
-
+    if (background) background.update(camera, mesh, face);
+    if (gravity) gravity.update()   
     renderer.render(scene, camera);
 }
 
@@ -118,9 +130,41 @@ function testEvent() {
             testOrigin();
             e.preventDefault();
         }
+        if (keyID == 'KeyD') {
+            testBackground();
+            e.preventDefault();
+        }
+
+        if (keyID == 'KeyF') {
+            if(!gravity) {
+                gravity = new Gravity(scene)
+                gravity.enable()
+            } else {
+                gravity.disable()
+                gravity = undefined
+            }
+            e.preventDefault();
+        }
+        if (keyID == 'KeyG') {
+            if(gravity) {
+                gravity.applyN = true
+            }
+            e.preventDefault();
+        }
 
     }, false);
 
+}
+
+function testBackground() {
+    if (!background) {
+        background = new Background(renderer, scene);  
+        console.log(background)
+    } 
+    else {
+        background.disable()
+        background = undefined
+    }
 }
 
 function testOrigin() {
@@ -134,6 +178,7 @@ function testOrigin() {
 function testTransparent() {
     controls.enabled = true;
     directionalLight.intensity = 1;
+
     if (!mouseLight)
         mouseLight = new MouseLight(scene, camera);
     mouseLight.enable();
@@ -161,4 +206,4 @@ window.onresize = function () {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize( w, h );
-};
+}
