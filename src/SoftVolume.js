@@ -16,8 +16,8 @@ var SoftVolume = function(scene, mesh, isGltf) {
     this.backdrag = 0.3; //0.6
     this.timestep = 40 / 1000; //18/1000 //40
     
-    this.effectRange = 2.5;
-    this.depressRate = 4;
+    this.effectRange = 25; //2.5
+    this.depressRate = 0.4; //4
     
     this.pullTo = -2;
     this.constraintTime = 2;
