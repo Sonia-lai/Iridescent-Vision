@@ -5,13 +5,17 @@ var GlassSkin = function(scene, mesh) {
     
     this.scene = scene;
     this.mesh = mesh;
-
+    this.uuid = []
     let cubeCamera;
     let enabled = false;
     let oriMaterial = mesh.material;
     let cubeMaterial;
 
     let init = () => {
+
+        for (var child of this.scene.children) {
+            this.uuid.push(child.uuid)
+        } 
 
         cubeCamera = new THREE.CubeCamera(1, 100, 256); 
         this.scene.add(cubeCamera);
