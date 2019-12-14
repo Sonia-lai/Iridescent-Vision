@@ -96,7 +96,6 @@ function animate() {
     if (mouseLight) mouseLight.update(mesh);
 
     renderer.render(scene, camera);
-    
 }
 
 
