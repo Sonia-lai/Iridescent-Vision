@@ -126,7 +126,7 @@ var Background = function (renderer, scene) {
             });
         ground = new THREE.Mesh(groundGeo, groundMat);
         ground.rotation.x = -0.5 * Math.PI;
-        ground.position.set(0, 0, zMove);
+        ground.position.set(0, -10, zMove);
         ground.receiveShadow = true;
         return ground
     }

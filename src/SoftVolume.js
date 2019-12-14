@@ -20,8 +20,9 @@ var SoftVolume = function(scene, mesh, isGltf) {
     this.depressRate = 4;
     
     this.pullTo = -2;
-    this.constraintTime = 1; //3
-    this.timeoutms = 4000; //4000
+    this.constraintTime = 2;
+    this.timeoutms = 3000;
+
     
     //private variable
     var enabled = false;
@@ -38,7 +39,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
     let mouse = new THREE.Vector2( 0.5, 0.5 );
     let mouse3d = new THREE.Vector3( 0, 0, 0 );
     let raycaster = new THREE.Raycaster();
-    
+
     let timeout = undefined;
 
     let oriMaterial;
@@ -212,6 +213,9 @@ var SoftVolume = function(scene, mesh, isGltf) {
                 this.mesh.geometry.attributes.position.array[ i*3 ] = particles[ i ].position.x;
                 this.mesh.geometry.attributes.position.array[ i*3+1 ] = particles[ i ].position.y;
                 this.mesh.geometry.attributes.position.array[ i*3+2 ] = particles[ i ].position.z;
+                // this.mesh.geometry.attributes.position.array[ i*3 ] += particles[ i ].position.x - particles[ i ].previous.x;
+                // this.mesh.geometry.attributes.position.array[ i*3+1 ] += particles[ i ].position.y - particles[ i ].previous.y;
+                // this.mesh.geometry.attributes.position.array[ i*3+2 ] += particles[ i ].position.z - particles[ i ].previous.z;
             }
         }
         if (this.isGltf)
@@ -232,7 +236,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
         for (i = 0, il = particles.length; i < il; i ++ ) {
     
             let particle = particles[ i ];
-    
+
             let force = new THREE.Vector3().copy ( particle.original );
             particle.addForce( force.sub(particle.position).multiplyScalar( this.pull ) );
             particle.integrate( timesq );
@@ -245,6 +249,8 @@ var SoftVolume = function(scene, mesh, isGltf) {
     
             if ( click && psel ) {
                 let offset = mouse3d.clone().sub(particles[ psel ].position);
+                //console.log(this.mesh.position);
+                offset.sub(this.mesh.position);
                 let offsetOri = mouse3d.distanceTo(particles[ psel ].original);
                 //console.log(offsetOri);
                 for ( i = 0; i < particles.length; i++ ) {
@@ -306,7 +312,8 @@ var SoftVolume = function(scene, mesh, isGltf) {
 
         if (psel == undefined && click && !mouse3d.equals( new THREE.Vector3(0,0,0)) ) {
             setFirstClick(true);
-            let dist = 9999;
+            let dist = Infinity;
+            mouse3d.sub(this.mesh.position);
             // find nearest particle
             for (let i = 0; i < particles.length; i++ ){
                 let tmp = mouse3d.distanceTo(particles[i].position);
@@ -331,11 +338,13 @@ var SoftVolume = function(scene, mesh, isGltf) {
         }
         //TODO: plane depth calculate?
         let tmpmouse = new Vector3();
-        let newPlane = new THREE.Plane( camera.position.clone().normalize(), this.pullTo);
-        console.log(newPlane)
+        let camToMesh = new THREE.Vector3().subVectors(camera.position, this.mesh.position).normalize();
+        let newPlane = new THREE.Plane(camToMesh , this.pullTo - camToMesh.dot(this.mesh.position));
+        
         raycaster.ray.intersectPlane( newPlane, tmpmouse );
         // let newSphere = new THREE.Sphere( this.mesh.position.clone(), this.pullTo);
         // raycaster.ray.intersectSphere (newSphere, tmpmouse);
+
         if ( tmpmouse != null ) {
             mouse3d.copy(tmpmouse);
         }
