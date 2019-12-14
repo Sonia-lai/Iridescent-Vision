@@ -21,14 +21,42 @@ var background, gravity;
 var controls;
 var directionalLight;
 
-
+var soundHandler;
 
 
 init();
 animate();
 
 function initSound() {
-    new SoundHandler();
+    soundHandler = new SoundHandler();
+    //call soundHandler.play() when click?
+    soundHandler.schedule(()=>{
+        console.log('start');
+        testSoft();
+        testBackground();
+        controls.enable = false;
+    }, 0, 0);
+    
+    soundHandler.schedule(()=>{
+        console.log('change to gravity');
+        if (softVolume) softVolume.disable();
+        gravity = new Gravity(scene, mesh)
+        gravity.enable()
+    }, 0, 30);
+
+    soundHandler.schedule(()=>{
+        console.log('change to transparent');
+        gravity.disable()
+        testTransparent();
+    }, 1, 9);
+
+    soundHandler.schedule(()=>{
+        console.log('seperate mask and head?');
+    }, 1, 38);
+
+    soundHandler.schedule(()=>{
+        console.log('???');
+    }, 1, 54);
 }
 
 function init() {
@@ -73,6 +101,7 @@ function init() {
                 mesh = child;
                 console.log(mesh.material);
                 scene.add(mesh);
+                
             }
         })
     })
@@ -110,7 +139,7 @@ function testEvent() {
                 background.disable()
                 background = undefined
             }
-            if (softVolume) softVolume.disable();
+            
             testTransparent();
             e.preventDefault();
         }
@@ -138,7 +167,7 @@ function testEvent() {
 
         if (keyID == 'KeyF') {
             if(!gravity) {
-                gravity = new Gravity(scene)
+                gravity = new Gravity(scene, mesh)
                 gravity.enable()
             } else {
                 gravity.disable()
@@ -205,6 +234,7 @@ function testOrigin() {
 }
 
 function testTransparent() {
+    if (softVolume) softVolume.disable();
     controls.enabled = true;
     directionalLight.intensity = 1;
 

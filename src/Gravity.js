@@ -1,8 +1,9 @@
 import { SceneUtils, MeshStandardMaterial } from 'three/build/three.module';
 import * as THREE from 'three';
 import * as OIMO from 'oimo';
+import {Vec3} from 'oimo/src/math/Vec3';
 
-var Gravity = function (scene) {
+var Gravity = function (scene, mesh) {
     let geo = {
 
         plane     : new THREE.PlaneBufferGeometry(1, 1),
@@ -26,7 +27,7 @@ var Gravity = function (scene) {
     this.scene  = scene;
     this.enabled = false;
     this.center = new THREE.Vector3(0, 0, 0);
-
+    this.mesh = mesh;
 
     let rand = (low, high) => low + Math.random() * (high - low);
     let randInt = (low, high) => low + Math.floor(Math.random() * (high - low + 1));
@@ -92,19 +93,21 @@ var Gravity = function (scene) {
         var force, m;
         var r = 3;
         let applyN = this.applyN
-        let center = this.center
-
+        //let center = this.center
+        let center = new Vec3(pos.x, pos.y, pos.z);
         bodys.forEach(function (b, id) {
             
             if (b.type === 1) {
                 m = b.mesh;
-        
-                force = m.position.clone().negate().normalize().multiplyScalar(0.2);
+                force = center.clone().sub(m.position).normalize().multiplyScalar(0.2);
+                //force = m.position.clone().negate().normalize().multiplyScalar(0.2);
                 if (applyN && Math.floor(Math.random() * 2)) {
                     force = force.negate().multiplyScalar(30);
                 } 
                 b.applyImpulse(center, force);
 
+            } else {
+                b.setPosition(center);
             }
 
         });
@@ -113,7 +116,7 @@ var Gravity = function (scene) {
 
     let init = () => {
         world = initWorld()
-        add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
+        add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [this.mesh.position.x, this.mesh.position.y, this.mesh.position.z], density: 1 }, true);
         for (var i = 0; i < size; i++) {
             var b = add2World(createParticle(rand(0.1, 0.3)))
         }

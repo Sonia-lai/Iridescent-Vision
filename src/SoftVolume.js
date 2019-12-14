@@ -301,7 +301,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
     }
 
     let updateMouse = (camera) => {
-        console.log(mouse, camera)
+        //console.log(mouse, camera)
         raycaster.setFromCamera( mouse, camera);
         var intersects = raycaster.intersectObjects([this.mesh], true );
 
