@@ -1,16 +1,38 @@
 import * as THREE from 'three';
+import { throws } from 'assert';
 
 export default class Building {
-    constructor(x, y, z, width, height, depth, bldgColor, bldgTexture, scene, rotX = 0, rotY = 0, rotZ = 0) {
-        this.geo = new THREE.CubeGeometry(width / 2, height / 2, depth);
+    constructor(x, y, z, width, height, depth, bldgColor, bldgTexture, rotX = 0, rotY = 0, rotZ = 0) {
+        function CustomSinCurve(scale) {
+            THREE.Curve.call(this);
+            this.type = x > -15 ? 1: 0; 
+            this.scale = (scale === undefined) ? 1 : scale;
+
+        }
+
+        CustomSinCurve.prototype = Object.create(THREE.Curve.prototype);
+        CustomSinCurve.prototype.constructor = CustomSinCurve;
+
+        CustomSinCurve.prototype.getPoint = function (t) {
+            if (this.type == 0) var tx = Math.cos(2 * Math.PI * t);
+            else var tx = Math.sin(2 * Math.PI * t);
+        
+            var ty = t * 10 - 1.5
+            var tz = 0
+
+            return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
+
+        };
+
+        var path = new CustomSinCurve(50);
+        var geometry = new THREE.TubeGeometry(path, 20, 0.5, 8, false);
+        this.geo = geometry
+        // this.geo = new THREE.CubeGeometry(width / 2, height / 2, depth);
         this.mat = new THREE.MeshLambertMaterial({
             color: bldgColor,
-            map: bldgTexture
         });
 
-        this.mat.map.wrapS = THREE.RepeatWrapping;
-        this.mat.map.wrapT = THREE.RepeatWrapping;
-        this.mat.map.repeat.set(1, height / width > 2 ? 1 : 2);
+
 
         let halfHeight = height / 2,
             isRotated = rotX != 0 || rotY != 0 || rotZ != 0;
@@ -25,6 +47,9 @@ export default class Building {
             this.mesh.rotation.z = rotZ * Math.PI / 180;
         }
         this.mesh.castShadow = true;
-        scene.add(this.mesh);
+
+
+
+        // scene.add(this.mesh);
     }
 }

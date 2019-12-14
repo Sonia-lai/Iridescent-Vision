@@ -13,8 +13,8 @@ var SoftVolume = function(scene, mesh, isGltf) {
 
     this.pull = 8.5; //7.5
     this.drag = 0.97; //0.97
-    this.backdrag = 0.6;
-    this.timestep = 40 / 1000; //18/1000
+    this.backdrag = 0.3; //0.6
+    this.timestep = 40 / 1000; //18/1000 //40
     
     this.effectRange = 2.5;
     this.depressRate = 4;
@@ -22,6 +22,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
     this.pullTo = -2;
     this.constraintTime = 2;
     this.timeoutms = 3000;
+
     
     //private variable
     var enabled = false;
@@ -246,19 +247,6 @@ var SoftVolume = function(scene, mesh, isGltf) {
     
         for (let j = 0; j < this.constraintTime; j++) {
     
-            if ( j % 2 == 1) {
-                for (i = il-1; i >=0; i-- ) {
-                    let constraint = constraints[ i ];
-                    satisfyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
-                }
-            }
-            else {
-                for (i = 0; i < il; i ++ ) {
-                    let constraint = constraints[ i ];
-                    satisfyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
-                }
-            }
-            let c = 0;
             if ( click && psel ) {
                 let offset = mouse3d.clone().sub(particles[ psel ].position);
                 //console.log(this.mesh.position);
@@ -277,6 +265,22 @@ var SoftVolume = function(scene, mesh, isGltf) {
                 }
             }
     
+
+
+            if ( j % 2 == 1) {
+                for (i = il-1; i >=0; i-- ) {
+                    let constraint = constraints[ i ];
+                    satisfyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
+                }
+            }
+            else {
+                for (i = 0; i < il; i ++ ) {
+                    let constraint = constraints[ i ];
+                    satisfyConstraints( constraint[ 0 ], constraint[ 1 ], constraint[ 2 ] );
+                }
+            }
+
+            
     
         }
     
@@ -297,6 +301,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
     }
 
     let updateMouse = (camera) => {
+        console.log(mouse, camera)
         raycaster.setFromCamera( mouse, camera);
         var intersects = raycaster.intersectObjects([this.mesh], true );
 
@@ -320,7 +325,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
 
             for (let i = 0; i < particles.length; i++ ) {
                 particles[i].distance = particles[psel].original.distanceTo( particles[i].original );
-
+                
                 // let ps = particles[psel].original.clone();
                 // let pi = particles[i].original.clone();
                 // let zDis = Math.abs(ps.z - pi.z);
@@ -335,6 +340,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
         let tmpmouse = new Vector3();
         let camToMesh = new THREE.Vector3().subVectors(camera.position, this.mesh.position).normalize();
         let newPlane = new THREE.Plane(camToMesh , this.pullTo - camToMesh.dot(this.mesh.position));
+        
         raycaster.ray.intersectPlane( newPlane, tmpmouse );
         // let newSphere = new THREE.Sphere( this.mesh.position.clone(), this.pullTo);
         // raycaster.ray.intersectSphere (newSphere, tmpmouse);
@@ -351,17 +357,38 @@ var SoftVolume = function(scene, mesh, isGltf) {
         e.preventDefault();
     }
 
+    let onTouchMove = (event) => {
+        //alert(click);
+        click = true;
+        event.preventDefault();
+        event.stopPropagation();
+        mouse.x = (event.touches[ 0 ].pageX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.touches[ 0 ].pageY / window.innerHeight) * 2 + 1;
+    }
+
     let onMouseDown = function(e) {
         if (e.button == 0)
             click = true;
     }
+
+    let onTouchStart = function(e) {
+        click = true;
+    }
     
     let onMouseUp = function (e) { 
+        
         if (e.button == 0) {
             if (click && psel) waitForFinished();
             click = false;
             psel = undefined;
         }
+    }
+
+    let onTouchEnd = function (e) {
+        //alert('~end');
+        if (click && psel) waitForFinished();
+        click = false;
+        psel = undefined;
     }
     
     let onMouseOut = function (e) { 
@@ -394,6 +421,9 @@ var SoftVolume = function(scene, mesh, isGltf) {
     document.addEventListener( 'mouseup', onMouseUp, false );
     document.addEventListener( 'mousedown', onMouseDown, false );
     document.addEventListener( 'mouseout', onMouseOut, false );
+    document.addEventListener( 'touchstart', onTouchStart, false );
+	document.addEventListener( 'touchend', onTouchEnd, false );
+    document.addEventListener( 'touchmove', onTouchMove, false );
 
 }
 
