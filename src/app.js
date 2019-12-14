@@ -40,7 +40,7 @@ function initSound() {
     soundHandler.schedule(()=>{
         console.log('change to gravity');
         if (softVolume) softVolume.disable();
-        gravity = new Gravity(scene, mesh)
+        gravity = new Gravity(scene)
         gravity.enable()
     }, 0, 30);
 
@@ -167,7 +167,7 @@ function testEvent() {
 
         if (keyID == 'KeyF') {
             if(!gravity) {
-                gravity = new Gravity(scene, mesh)
+                gravity = new Gravity(scene)
                 gravity.enable()
             } else {
                 gravity.disable()
