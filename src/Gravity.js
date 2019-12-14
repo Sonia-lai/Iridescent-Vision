@@ -20,12 +20,13 @@ var Gravity = function (scene) {
 
     let world;
     let bodys = [];
-    let size = 500;
+    let size = 300;
 
     this.applyN = true;
     this.scene  = scene;
     this.enabled = false;
     this.center = new THREE.Vector3(0, 0, 0);
+    this.all = false
 
 
     let rand = (low, high) => low + Math.random() * (high - low);
@@ -93,6 +94,7 @@ var Gravity = function (scene) {
         var r = 3;
         let applyN = this.applyN
         let center = this.center
+        let all    = this.all
 
         bodys.forEach(function (b, id) {
             
@@ -100,15 +102,19 @@ var Gravity = function (scene) {
                 m = b.mesh;
         
                 force = m.position.clone().negate().normalize().multiplyScalar(0.2);
-                if (applyN && Math.floor(Math.random() * 2)) {
-                    force = force.negate().multiplyScalar(30);
+                if (applyN && (Math.floor(Math.random() * 4) || all)) {
+                    if (!all) force = force.negate().multiplyScalar(Math.random() * 20);
+                    else force = force.negate().multiplyScalar(Math.random() * 50);
                 } 
+                
+ 
                 b.applyImpulse(center, force);
 
             }
 
         });
         if (this.applyN) this.applyN = false;
+        if (this.all) this.all = false
     }
 
     let init = () => {
@@ -134,6 +140,19 @@ var Gravity = function (scene) {
     }
 
     init()
+
+    let applyForce = () => {
+        this.applyN = true
+        this.all    = false 
+    }
+    
+    let applyAllForce = () => {
+        this.applyN = true
+        this.all    = true 
+    }
+
+    document.addEventListener('click'   , applyForce, false);
+    document.addEventListener('dblclick', applyAllForce, false)
 }
 
 export { Gravity }
