@@ -111,22 +111,38 @@ function testEvent() {
                 background = undefined
             }
             if (softVolume) softVolume.disable();
+            if (gravity) {
+                gravity.disable()
+                gravity = undefined
+            }
             testTransparent();
             e.preventDefault();
         }
         if (keyID == 'KeyB') {
             if (mouseLight) mouseLight.disable();
             if (glassSkin) glassSkin.disable();
+            if (gravity) {
+                gravity.disable()
+                gravity = undefined
+            }
             testSoft();
             e.preventDefault();
         }
         if (keyID == 'KeyC') {
             testOrigin();
+            if (gravity) {
+                gravity.disable()
+                gravity = undefined
+            }
             e.preventDefault();
         }
         if (keyID == 'KeyD') {
             if (mouseLight) mouseLight.disable();
             if (glassSkin) glassSkin.disable();
+            if (gravity) {
+                gravity.disable()
+                gravity = undefined
+            }
             testBackground();
             e.preventDefault();
         }
@@ -137,6 +153,9 @@ function testEvent() {
         }
 
         if (keyID == 'KeyF') {
+            if (mouseLight) mouseLight.disable();
+            if (glassSkin)  glassSkin.disable();
+            if (softVolume) softVolume.disable();
             if(!gravity) {
                 gravity = new Gravity(scene)
                 gravity.enable()
@@ -147,6 +166,7 @@ function testEvent() {
             e.preventDefault();
         }
         if (keyID == 'KeyG') {
+
             if(gravity) {
                 gravity.applyN = true
             }
