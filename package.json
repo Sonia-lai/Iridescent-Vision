@@ -20,7 +20,7 @@
     "babel-loader": "8.0.6",
     "babel-preset-env": "1.7.0",
     "cannon": "0.6.2",
-    "file-loader": "4.3.0",
+    "file-loader": "^4.3.0",
     "gh-pages": "2.1.1",
     "gltf-loader-2": "0.0.3",
     "gltf-webpack-loader": "1.0.6",
@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "dat.gui": "^0.7.6",
-    "oimo": "^1.0.9"
+    "oimo": "^1.0.9",
+    "tone": "^13.8.25"
   }
 }

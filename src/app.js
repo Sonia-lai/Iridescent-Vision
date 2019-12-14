@@ -9,8 +9,7 @@ import { SoftVolume } from './SoftVolume';
 import { Background } from './Background'
 import * as dat from 'dat.gui';
 import { Gravity } from './Gravity'
-
-
+import {SoundHandler} from './SoundHandler';
 
 var camera, scene, renderer;
 
@@ -28,8 +27,12 @@ var directionalLight;
 init();
 animate();
 
-function init() {
+function initSound() {
+    new SoundHandler();
+}
 
+function init() {
+    initSound();
     let width  = window.innerWidth
     let height = window.innerHeight
     
@@ -74,24 +77,12 @@ function init() {
         })
     })
 
-
-    let MeshMaterial = new THREE.MeshPhongMaterial( {
-        color: 0xffffff,
-        // emissive: 0xc325e,
-        // specular: 0x441833,
-        side: THREE.DoubleSide,
-        alphaTest: 0.7,
-        shininess: 30,
-        
-    } );
-
     loader.load( headPath, gltf => {
-        let model = gltf.scene;
-        model.position.set(2, 0, -15);
-        model.scale.set(0.08, 0.08, 0.08);
-        model.rotation.set(0, Math.PI, 0);
-        face = model
-        scene.add(model);
+        face = gltf.scene;
+        face.position.set(2, 0, -15);
+        face.scale.set(0.08, 0.08, 0.08);
+        face.rotation.set(0, Math.PI, 0);
+        scene.add(face);
     })
     
     document.body.appendChild(renderer.domElement);
