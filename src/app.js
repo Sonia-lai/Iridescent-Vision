@@ -106,7 +106,7 @@ function animate() {
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
-    if (gravity) gravity.update()   
+    if (gravity) gravity.update(mesh.position)   
     renderer.render(scene, camera);
     
 }

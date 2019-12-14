@@ -87,7 +87,7 @@ var Gravity = function (scene) {
 
     }
 
-    let postLoop = () => {
+    let postLoop = (pos) => {
         
         var force, m;
         var r = 3;
@@ -98,11 +98,13 @@ var Gravity = function (scene) {
             
             if (b.type === 1) {
                 m = b.mesh;
+        
                 force = m.position.clone().negate().normalize().multiplyScalar(0.2);
                 if (applyN && Math.floor(Math.random() * 2)) {
                     force = force.negate().multiplyScalar(30);
                 } 
                 b.applyImpulse(center, force);
+
             }
 
         });
@@ -113,7 +115,7 @@ var Gravity = function (scene) {
         world = initWorld()
         add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
         for (var i = 0; i < size; i++) {
-            add2World(createParticle(rand(0.1, 0.3)))
+            var b = add2World(createParticle(rand(0.1, 0.3)))
         }
     };
 
@@ -127,8 +129,8 @@ var Gravity = function (scene) {
         world.stop()
     }
 
-    this.update = () => {
-        postLoop()
+    this.update = (pos) => {
+        postLoop(pos)
     }
 
     init()
