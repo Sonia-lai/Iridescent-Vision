@@ -22,6 +22,7 @@ var Gravity = function (scene) {
     let world;
     let bodys = [];
     let size = 300;
+    this.uuid = []
 
     this.applyN = true;
     this.scene  = scene;
@@ -120,28 +121,58 @@ var Gravity = function (scene) {
     }
 
     let init = () => {
+        for (var child of this.scene.children) {
+            this.uuid.push(child.uuid)
+        } 
         world = initWorld()
         add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
         for (var i = 0; i < size; i++) {
             var b = add2World(createParticle(rand(0.1, 0.3)))
         }
+
     };
+
+
 
     this.enable = () => {
         this.enabled = true
         world.play()
     }
 
+
     this.disable = () => {
         this.enabled = false
         world.stop()
+
+        for (var i = this.scene.children.length - 1; i >= 0; i--) {
+            let obj = this.scene.children[i]
+            if (!this.uuid.includes(obj.uuid)) {
+                clearObject(obj, this.scene)
+            }
+
+        }
+    }
+
+    function clearObject(obj, scene) {
+        scene.remove(obj);
+        if (obj.geometry) {
+            obj.geometry.dispose()
+        }
+        if (obj.material) {
+            Object.keys(obj.material).forEach(prop => {
+                if (!obj.material[prop])
+                    return
+                if (typeof obj.material[prop].dispose === 'function')
+                    obj.material[prop].dispose()
+            })
+            obj.material.dispose()
+        }
     }
 
     this.update = (pos) => {
         postLoop(pos)
     }
 
-    init()
 
     let applyForce = () => {
         this.applyN = true
@@ -155,6 +186,8 @@ var Gravity = function (scene) {
 
     document.addEventListener('click'   , applyForce, false);
     document.addEventListener('dblclick', applyAllForce, false)
+
+    init()
 }
 
 export { Gravity }
