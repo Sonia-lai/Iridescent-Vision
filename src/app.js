@@ -61,37 +61,45 @@ function initSound() {
 
 function init() {
     initSound();
+
     let width  = window.innerWidth
     let height = window.innerHeight
     
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-    // camera.position.set(0, 50, 50);
     camera.position.set(0, 10, 40);
-
-
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setClearColor('#FFFFFF');
     
-    // move controls to global for furthur disable
     controls = new OrbitControls(camera, renderer.domElement)
 
-    //let directionalLight = new THREE.DirectionalLight(0xffffff, 7);
+    initLight()
+    initModel()
 
+
+
+    
+    document.body.appendChild(renderer.domElement);
+    // controls.autoRotate = true
+    testEvent();
+}
+
+
+function initLight() {
     directionalLight = new THREE.DirectionalLight(0xffffff, 2);
-
-    directionalLight.position.set(-1,-0.4,1);
+    directionalLight.position.set(-1, -0.4, 1);
     scene.add(directionalLight);
     scene.add(new THREE.DirectionalLight(0xffffff, 0.5));
+}
 
+
+function initModel() {
     let loader = new GLTFLoader();
 
-    loader.load( maskPath, gltf => {
+    loader.load(maskPath, gltf => {
         let model = gltf.scene
-
-        // move scene add model inside traverse
         model.traverse(child => {
             if (child.isMesh) {
                 child.geometry.rotateY(1.7);
@@ -101,22 +109,18 @@ function init() {
                 mesh = child;
                 console.log(mesh.material);
                 scene.add(mesh);
-                
+
             }
         })
-    })
+    });
 
-    loader.load( headPath, gltf => {
+    loader.load(headPath, gltf => {
         face = gltf.scene;
         face.position.set(2, 0, -15);
         face.scale.set(0.08, 0.08, 0.08);
         face.rotation.set(0, Math.PI, 0);
         scene.add(face);
-    })
-    
-    document.body.appendChild(renderer.domElement);
-    // controls.autoRotate = true
-    testEvent();
+    });
 }
 
 function animate() {
