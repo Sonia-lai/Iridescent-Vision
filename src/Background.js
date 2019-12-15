@@ -7,7 +7,7 @@ var Background = function (renderer, scene) {
     let bldgs  = [], debris = []
     let debrisIdealSet = []
     
-    let bldgColor = 0x242424, lightColor = 0x444444, skyColor = 0xaaaaaa, recoverColor = 0xFFFFFF,
+    let bldgColor = 0x8e57b5, lightColor = 0x444444, skyColor = 0x343161, recoverColor = 0xFFFFFF,
         chunkSize = 200, chunksAtATime = 6, debrisPerChunk = 32, debrisMaxChunkAscend = 10, lgBldgSize = 12;
 
     const Debris = require('./background/debris').default;
@@ -220,7 +220,8 @@ var Background = function (renderer, scene) {
         renderer.shadowMap.enabled = true;
         backgroundGenerate(chunkSize, chunksAtATime)
         lightGenerate(lightColor, this.brightness)
-        this.scene.fog = new THREE.Fog(skyColor, 0  , this.dfogDistance);
+        this.scene.fog = new THREE.Fog(skyColor, 0.01, this.fogDistance);
+        
 
     }
 

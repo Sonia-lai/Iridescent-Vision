@@ -6,7 +6,7 @@ var MouseLight = function (scene, camera) {
     this.scene = scene;
     this.camera = camera;
 
-    this.initIntensity = 0.3;
+    this.initIntensity = 1;
     this.initAngle = 0.1;
 
     this.intensityStep = 0.02;
@@ -57,7 +57,7 @@ var MouseLight = function (scene, camera) {
     
         if ( intersects.length != 0 ) {
             count ++;
-            if (count % 50 == 0) {
+            if (count % 100 == 0) {
                 light.intensity += this.intensityStep; 
                 light.angle += this.angleStep; 
             }

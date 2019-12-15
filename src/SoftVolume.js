@@ -187,7 +187,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
         var texture = textureLoader.load( "https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png" );
 
         let MeshMaterial = new THREE.MeshPhongMaterial( {
-            color: 0x12aaf7,
+            color: 0x624eba,
             emissive: 0xc325e,
             specular: 0x441833,
             map: texture,

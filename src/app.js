@@ -40,7 +40,7 @@ function initSound() {
     soundHandler.schedule(()=>{
         console.log('change to gravity');
         if (softVolume) softVolume.disable();
-        gravity = new Gravity(scene)
+        gravity = new Gravity(scene, mesh)
         gravity.enable()
     }, 0, 30);
 
@@ -115,7 +115,7 @@ function init() {
     })
     
     document.body.appendChild(renderer.domElement);
-    
+    // controls.autoRotate = true
     testEvent();
 }
 
@@ -126,6 +126,7 @@ function animate() {
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
     if (gravity) gravity.update(mesh.position)   
+    // controls.update();
     renderer.render(scene, camera);
 }
 
@@ -187,7 +188,7 @@ function testEvent() {
             if (glassSkin)  glassSkin.disable();
             if (softVolume) softVolume.disable();
             if(!gravity) {
-                gravity = new Gravity(scene)
+                gravity = new Gravity(scene, mesh)
                 gravity.enable()
             } else {
                 gravity.disable()
@@ -229,9 +230,46 @@ function testEvent() {
             e.preventDefault();
         }
 
+        if(keyID == 'KeyZ') {
+            camera.position.set(0, 20, 100);
+            controls.update();
+        }
+
+        if(keyID == 'KeyK') {
+            if (background) {
+                background.scene.fog.far += 10
+                console.log(background.scene.fog.far)
+            }
+
+        }
+        if (keyID == 'KeyL') {
+            if (background) {
+                background.scene.fog.far -= 10
+                console.log(background.scene.fog.far)
+            }
+        }
+
+        if(keyID == 'KeyO') {
+            if (background) {
+                background.speed += 1
+            }
+        }
+        if (keyID == 'KeyP') {
+            if (background) {
+                background.speed -= 1
+            }
+        }
+
+        if(keyID == 'KeyI') {
+            scaleAnimation()
+        }
+
+
     }, false);
 
 }
+
+
 
 function testBackground() {
     controls.enabled = true;
@@ -265,8 +303,11 @@ function testTransparent() {
     
     if (!glassSkin)
         glassSkin = new GlassSkin(scene, mesh);
+    renderer.setClearColor('#457552');
+    directionalLight.intensity = 0.8;
     
-    glassSkin.addTestBackground();
+
+    // glassSkin.addTestBackground();
     glassSkin.enable();
     
 }

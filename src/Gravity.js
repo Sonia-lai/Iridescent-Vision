@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import * as OIMO from 'oimo';
 import {Vec3} from 'oimo/src/math/Vec3';
 
-var Gravity = function (scene) {
+var Gravity = function (scene, mesh) {
     let geo = {
 
         plane     : new THREE.PlaneBufferGeometry(1, 1),
@@ -21,7 +21,7 @@ var Gravity = function (scene) {
 
     let world;
     let bodys = [];
-    let size = 300;
+    let size = 200;
     this.uuid = []
 
     this.applyN = true;
@@ -29,6 +29,7 @@ var Gravity = function (scene) {
     this.enabled = false;
     this.center = new THREE.Vector3(0, 0, 0);
     this.all = false
+    this.mesh = mesh
 
 
     let rand = (low, high) => low + Math.random() * (high - low);
@@ -78,8 +79,15 @@ var Gravity = function (scene) {
             s = new THREE.SphereGeometry(1, 32, 32);
         }
 
+        let MeshMaterial = new THREE.MeshStandardMaterial({
+            color: 0xffe6e6,
+            side: THREE.DoubleSide,
+            alphaTest: 0.7,
+            shininess: 30 });
+
         if (!noMesh) {
-            let meshtemp = new THREE.Mesh(s, new MeshStandardMaterial());
+            
+            let meshtemp = new THREE.Mesh(s, MeshMaterial);
             this.scene.add(meshtemp);
             meshtemp.position.set(b.pos[0], b.pos[1], b.pos[2]);
             s.scale(o.size[0], o.size[1], o.size[2]);
@@ -103,11 +111,11 @@ var Gravity = function (scene) {
             
             if (b.type === 1) {
                 m = b.mesh;
-                force = center.clone().sub(m.position).normalize().multiplyScalar(0.2);
+                force = center.clone().sub(m.position).normalize().multiplyScalar(1);
                 //force = m.position.clone().negate().normalize().multiplyScalar(0.2);
                 if (applyN && (Math.floor(Math.random() * 4) || all)) {
-                    if (!all) force = force.negate().multiplyScalar(Math.random() * 20);
-                    else force = force.negate().multiplyScalar(Math.random() * 50);
+                    if (!all) force = force.negate().multiplyScalar(Math.random() * 50);
+                    else force = force.negate().multiplyScalar(Math.random() * 70);
                 } 
                 b.applyImpulse(center, force);
 
@@ -121,17 +129,38 @@ var Gravity = function (scene) {
     }
 
     let init = () => {
+        changeTexture()
         for (var child of this.scene.children) {
             this.uuid.push(child.uuid)
         } 
         world = initWorld()
         add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
         for (var i = 0; i < size; i++) {
-            var b = add2World(createParticle(rand(0.1, 0.3)))
+            var b = add2World(createParticle(rand(0.5, 1)))
         }
+        
 
     };
+    let changeTexture = () => {
+        var textureLoader = new THREE.TextureLoader();
+        var texture = textureLoader.load("https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png");
 
+        let MeshMaterial = new THREE.MeshStandardMaterial({
+            color: 0xebaf09,
+            emissive: 0xc325e,
+            specular: 0x441833,
+            map: texture,
+            side: THREE.DoubleSide,
+            // alphaTest: 0.7,
+            // shininess: 30,
+            roughness: 0.32,
+            metalness: 0.28
+
+        });
+
+        this.mesh.material = MeshMaterial;
+
+    }
 
 
     this.enable = () => {
