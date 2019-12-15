@@ -272,7 +272,7 @@ function testEvent() {
 
 
 function testBackground() {
-    controls.enabled = true;
+    controls.enabled = false;
 
     if (!background) {
         background = new Background(renderer, scene);  
