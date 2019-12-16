@@ -23,6 +23,12 @@ var directionalLight;
 
 var soundHandler;
 
+var spline;
+var camPosIndex = 0;
+var randomPoints = [];
+var start = false
+
+
 
 init();
 animate();
@@ -79,14 +85,12 @@ function init() {
 
     initLight()
     initModel()
+    initRandomPoints()
 
 
 
     
     document.body.appendChild(renderer.domElement);
-    // controls.autoRotate = true
-    // renderer.setClearColor(0x000000, 1);
-    // directionalLight.intensity = 0
     testEvent();
 }
 
@@ -111,7 +115,6 @@ function initModel() {
                 child.geometry.translate(0, -30, 0)
                 child.geometry.computeVertexNormals();
                 mesh = child;
-                console.log(mesh.material);
                 scene.add(mesh);
 
             }
@@ -134,7 +137,12 @@ function animate() {
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
     if (gravity) gravity.update(mesh.position)  
-    if (controls.autoRotate) controls.update();
+    // if (start) coverMeshFace()
+    if (controls.autoRotate) {
+        controls.update();
+        if (controls.autoRotateSpeed < 100)  controls.autoRotateSpeed += 0.1
+
+    };
     renderer.render(scene, camera);
 }
 
@@ -269,8 +277,10 @@ function testEvent() {
         }
 
         if(keyID == 'KeyI') {
-            scaleAnimation()
+            start = true
+            // coverMeshFace()
         }
+
 
 
     }, false);
@@ -284,7 +294,6 @@ function testBackground() {
 
     if (!background) {
         background = new Background(renderer, scene);  
-        console.log(background)
     } 
     else {
         background.disable()
@@ -340,6 +349,78 @@ function testSoft() {
     softVolume.enable();
 }
 
+
+function initRandomPoints() {
+    for (var i = 0; i < 1000; i++) {
+        randomPoints.push(
+            new THREE.Vector3(Math.random() * 30 - 15, Math.random() * 30 - 15, Math.random() * 30 - 15)
+        );
+    }
+    spline =  new THREE.SplineCurve3(randomPoints);
+}
+
+
+function randomMovement() {
+    controls.autoRotate = false
+
+    camPosIndex += 5;
+    if (camPosIndex > 10000) {
+        camPosIndex = 0;
+    }
+    var camPos = spline.getPoint(camPosIndex / 10000);
+    var camRot = spline.getTangent(camPosIndex / 10000);
+
+
+
+    face.position.x = camPos.x;
+    face.position.y = camPos.y;
+    face.position.z = camPos.z;
+
+    face.rotation.x = camRot.x;
+    face.rotation.y = camRot.y;
+    face.rotation.z = camRot.z;
+
+    mesh.position.x = camPos.x;
+    mesh.position.y = camPos.y;
+    mesh.position.z = camPos.z;
+
+    mesh.rotation.x = camRot.x;
+    mesh.rotation.y = camRot.y;
+    mesh.rotation.z = camRot.z;
+
+    face.lookAt(spline.getPoint((camPosIndex + 1) / 10000));
+    mesh.lookAt(spline.getPoint((camPosIndex + 1) / 10000));
+}
+
+
+
+function separateFaceMesh() {
+
+    controls.autoRotate = false
+
+    // face.position.x -= 1
+    // face.position.y -= 1
+    face.position.z -= 1
+
+    // mesh.position.x += 1
+    // mesh.position.y += 1
+    mesh.position.z += 1
+}
+
+
+function coverMeshFace() {
+    face.visible = false
+    mesh.visible = false
+    renderer.setClearColor('#FFFFFF');
+    setTimeout(() => {
+
+        console.log('start')
+        renderer.setClearColor('#457552');
+        face.visible = true
+        mesh.visible = true
+    }, 100);
+}
+
 window.onresize = function () {
     let w = window.innerWidth;
     let h = window.innerHeight;
@@ -347,5 +428,9 @@ window.onresize = function () {
     camera.updateProjectionMatrix();
     renderer.setSize( w, h );
 }
+
+
+
+
 
 
