@@ -111,8 +111,7 @@ var Gravity = function (scene, mesh) {
             
             if (b.type === 1) {
                 m = b.mesh;
-                force = center.clone().sub(m.position).normalize().multiplyScalar(1);
-                //force = m.position.clone().negate().normalize().multiplyScalar(0.2);
+                force = center.clone().sub(m.position).normalize().multiplyScalar(10);
                 if (applyN && (Math.floor(Math.random() * 4) || all)) {
                     if (!all) force = force.negate().multiplyScalar(Math.random() * 50);
                     else force = force.negate().multiplyScalar(Math.random() * 70);
@@ -151,8 +150,6 @@ var Gravity = function (scene, mesh) {
             specular: 0x441833,
             map: texture,
             side: THREE.DoubleSide,
-            // alphaTest: 0.7,
-            // shininess: 30,
             roughness: 0.32,
             metalness: 0.28
 

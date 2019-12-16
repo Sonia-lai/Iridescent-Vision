@@ -11,7 +11,7 @@ var Background = function (renderer, scene) {
     
     this.scene = scene;
     this.direction = 'forward'
-    this.speed = 0;
+    this.speed = 0.05;
     this.fogDistance = 10; 
     this.brightness  = 0.1;
 
@@ -19,6 +19,10 @@ var Background = function (renderer, scene) {
 
     this.update = (camera, mesh, face) => {
         backgroundUpdate(camera, mesh, face)
+        if (this.scene.fog.far <= 720) {
+            if (scene.fog.far <= 100) this.scene.fog.far += 0.5
+            else this.scene.fog.far += 1
+        }
     }
     
     this.disable = () => {

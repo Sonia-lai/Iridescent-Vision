@@ -42,6 +42,8 @@ function initSound() {
         if (softVolume) softVolume.disable();
         gravity = new Gravity(scene, mesh)
         gravity.enable()
+        background.direction = 'up'
+        // background.speed     = 0.3
     }, 0, 30);
 
     soundHandler.schedule(()=>{
@@ -83,6 +85,8 @@ function init() {
     
     document.body.appendChild(renderer.domElement);
     // controls.autoRotate = true
+    // renderer.setClearColor(0x000000, 1);
+    // directionalLight.intensity = 0
     testEvent();
 }
 
@@ -129,8 +133,8 @@ function animate() {
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
-    if (gravity) gravity.update(mesh.position)   
-    // controls.update();
+    if (gravity) gravity.update(mesh.position)  
+    if (controls.autoRotate) controls.update();
     renderer.render(scene, camera);
 }
 
@@ -297,6 +301,10 @@ function testOrigin() {
 }
 
 function testTransparent() {
+    if (background) {
+        background.disable()
+        background = undefined
+    }
     if (softVolume) softVolume.disable();
     controls.enabled = true;
     directionalLight.intensity = 1;
@@ -312,7 +320,12 @@ function testTransparent() {
     
 
     // glassSkin.addTestBackground();
+    camera.position.set(0, 10, 40);
+    face.position.set(2, 0, -15);
+    mesh.position.set(0, 0, 0)
+    controls.autoRotate = true
     glassSkin.enable();
+
     
 }
 
@@ -334,3 +347,5 @@ window.onresize = function () {
     camera.updateProjectionMatrix();
     renderer.setSize( w, h );
 }
+
+
