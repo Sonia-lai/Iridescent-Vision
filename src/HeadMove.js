@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 
-var HeadMove = function (renderer, camera, scene, face, model, mesh, controls) {
+var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
 
     let randomPoints = [], camPosIndex = 0, spline, deltaFlake = 0.5, deltaShake = 1, deltaMove = 1;
     let upper = 50, lower  = -50;
@@ -10,7 +10,6 @@ var HeadMove = function (renderer, camera, scene, face, model, mesh, controls) {
     this.scene  = scene
     this.face   = face
     this.mesh   = mesh
-    this.model  = model
     this.controls = controls
     this.renderer = renderer
     this.direction = 'up'

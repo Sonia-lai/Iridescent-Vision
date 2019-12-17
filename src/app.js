@@ -14,7 +14,7 @@ import {SoundHandler} from './SoundHandler';
 
 var camera, scene, renderer;
 
-var mesh, face, model; //model mesh
+var mesh, face; //model mesh
 var mouseLight, glassSkin; // use for transparent effect
 var softVolume; // use for softvolume effect
 
@@ -110,7 +110,7 @@ function initModel() {
     let loader = new GLTFLoader();
 
     loader.load(maskPath, gltf => {
-        model = gltf.scene
+        let model = gltf.scene
         model.traverse(child => {
             if (child.isMesh) {
                 child.geometry.rotateY(1.7);
@@ -273,7 +273,7 @@ function testEvent() {
         }
 
         if (keyID == 'KeyQ') {
-            headmove = new HeadMove(renderer, camera, scene, face, model, mesh, controls)
+            headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
             headmove.enable()
         }
         if (keyID == 'KeyW') {
@@ -363,14 +363,11 @@ function initRandomPoints() {
 
 function backgroundFlash() {
     face.visible = false
-    model.visible = false
     mesh.visible = false
-    console.log(model.visible)
     renderer.setClearColor('#FFFFFF');
     setTimeout(() => {
         renderer.setClearColor('#457552');
         face.visible = true
-        model.visible = true
         mesh.visible = true
     }, 100);
 }
