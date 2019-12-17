@@ -7,10 +7,14 @@ import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
 import { SoftVolume } from './SoftVolume';
 import { Background } from './Background'
-import { HeadMove }   from './HeadMove'
+import { HeadMove } from './HeadMove'
+import {Activity} from './Activity'
 import * as dat from 'dat.gui';
 import { Gravity } from './Gravity'
-import {SoundHandler} from './SoundHandler';
+import { SoundHandler } from './SoundHandler';
+
+// import bgImage from './images/poster.jpg'
+// import linkImage from './images/sonia.jpg'
 
 var camera, scene, renderer;
 
@@ -18,18 +22,16 @@ var mesh, face; //model mesh
 var mouseLight, glassSkin; // use for transparent effect
 var softVolume; // use for softvolume effect
 
-var background, gravity, headmove;
+var background, gravity, headmove, activity;
 var controls;
 var directionalLight;
 
+// var raycaster = new THREE.Raycaster(), INTERSECTED;
+// var mouse = new THREE.Vector2();
+// var eventType, sphere;
+
 var soundHandler;
 
-var spline;
-var camPosIndex = 0;
-var randomPoints = [];
-var randomMove = false
-var seperate   = false
-var delta = 0.5
 
 
 
@@ -39,14 +41,14 @@ animate();
 function initSound() {
     soundHandler = new SoundHandler();
     //call soundHandler.play() when click?
-    soundHandler.schedule(()=>{
+    soundHandler.schedule(() => {
         console.log('start');
         testSoft();
         testBackground();
         controls.enable = false;
     }, 0, 0);
-    
-    soundHandler.schedule(()=>{
+
+    soundHandler.schedule(() => {
         console.log('change to gravity');
         if (softVolume) softVolume.disable();
         gravity = new Gravity(scene, mesh)
@@ -55,17 +57,17 @@ function initSound() {
         // background.speed     = 0.3
     }, 0, 30);
 
-    soundHandler.schedule(()=>{
+    soundHandler.schedule(() => {
         console.log('change to transparent');
         gravity.disable()
         testTransparent();
     }, 1, 9);
 
-    soundHandler.schedule(()=>{
+    soundHandler.schedule(() => {
         console.log('seperate mask and head?');
     }, 1, 38);
 
-    soundHandler.schedule(()=>{
+    soundHandler.schedule(() => {
         console.log('???');
     }, 1, 54);
 }
@@ -73,9 +75,9 @@ function initSound() {
 function init() {
     initSound();
 
-    let width  = window.innerWidth
+    let width = window.innerWidth
     let height = window.innerHeight
-    
+
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
@@ -83,19 +85,22 @@ function init() {
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setClearColor('#FFFFFF');
-    
+
     controls = new OrbitControls(camera, renderer.domElement)
 
     initLight()
     initModel()
-    initRandomPoints()
 
 
 
-    
     document.body.appendChild(renderer.domElement);
     testEvent();
+
+
+
 }
+
+
 
 
 function initLight() {
@@ -136,22 +141,6 @@ function initModel() {
 
 }
 
-function clearObject(obj, scene) {
-    scene.remove(obj);
-    if (obj.geometry) {
-        obj.geometry.dispose()
-    }
-    if (obj.material) {
-        Object.keys(obj.material).forEach(prop => {
-            if (!obj.material[prop])
-                return
-            if (typeof obj.material[prop].dispose === 'function')
-                obj.material[prop].dispose()
-        })
-        obj.material.dispose()
-    }
-}
-
 
 function animate() {
     requestAnimationFrame(animate);
@@ -159,38 +148,26 @@ function animate() {
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
-    if (gravity) gravity.update(mesh.position)  
-    if (randomMove) randomMovement()
-    if (seperate) {
-        separateFaceMesh(delta)
-        delta += 0.01
-        if (delta >= 1) {
-            console.log(scene.children.length)
-            for(var i = 0; i < scene.children.length; i++) {
-                if (scene.children[i].name == 'mask') clearObject(scene.children[i], scene)
-            }
-            controls.autoRotate = false
-            camera.rotation.z += 1
-            camera.position.z -= 1
-        }
-    }
-
+    if (gravity) gravity.update(mesh.position)
     if (headmove) headmove.update(controls)
+    if (activity) activity.update(camera)
 
     renderer.render(scene, camera);
+
+
 }
 
 
 function testEvent() {
-    window.addEventListener('keydown', function(e){  
+    window.addEventListener('keydown', function (e) {
         var keyID = e.code;
         console.log(keyID);
-        if(keyID === 'KeyA')  {
-            if(background) {
+        if (keyID === 'KeyA') {
+            if (background) {
                 background.disable()
                 background = undefined
             }
-            
+
             if (softVolume) softVolume.disable();
             if (gravity) {
                 gravity.disable()
@@ -235,9 +212,9 @@ function testEvent() {
 
         if (keyID == 'KeyF') {
             if (mouseLight) mouseLight.disable();
-            if (glassSkin)  glassSkin.disable();
+            if (glassSkin) glassSkin.disable();
             if (softVolume) softVolume.disable();
-            if(!gravity) {
+            if (!gravity) {
                 gravity = new Gravity(scene, mesh)
                 gravity.enable()
             } else {
@@ -248,27 +225,27 @@ function testEvent() {
         }
         if (keyID == 'KeyG') {
 
-            if(gravity) {
+            if (gravity) {
                 gravity.applyN = true
             }
             e.preventDefault();
         }
 
 
-        if(keyID == 'KeyO') {
+        if (keyID == 'KeyO') {
             if (background) {
                 background.speed += 1
             }
         }
 
-    
+
         if (keyID == 'KeyP') {
             if (background) {
                 background.speed -= 1
             }
         }
 
-        if(keyID == 'KeyI') {
+        if (keyID == 'KeyI') {
             backgroundFlash()
         }
 
@@ -290,6 +267,15 @@ function testEvent() {
             headmove.changeMode('rotate', camera, face, mesh)
         }
 
+        if (keyID == 'KeyU') {
+            if (headmove) {
+                headmove.disable()
+                headmove = undefined
+            }
+            activity = new Activity(camera, scene, controls)
+            activity.enable()
+        }
+
 
     }, false);
 
@@ -301,8 +287,8 @@ function testBackground() {
     controls.enabled = false;
 
     if (!background) {
-        background = new Background(renderer, scene);  
-    } 
+        background = new Background(renderer, scene);
+    }
     else {
         background.disable()
         background = undefined
@@ -328,15 +314,16 @@ function testTransparent() {
     if (!mouseLight)
         mouseLight = new MouseLight(scene, camera);
     mouseLight.enable();
-    
+
     if (!glassSkin)
         glassSkin = new GlassSkin(scene, mesh);
-    renderer.setClearColor('#457552');
+
+    renderer.setClearColor('#457552');  
     directionalLight.intensity = 0.8;
-    
+
     glassSkin.enable();
 
-    
+
 }
 
 function testSoft() {
@@ -348,16 +335,6 @@ function testSoft() {
         softVolume.setGUI(gui);
     }
     softVolume.enable();
-}
-
-
-function initRandomPoints() {
-    for (var i = 0; i < 1000; i++) {
-        randomPoints.push(
-            new THREE.Vector3(Math.random() * 30 - 15, Math.random() * 30 - 15, Math.random() * 30 - 15)
-        );
-    }
-    spline =  new THREE.SplineCurve3(randomPoints);
 }
 
 
@@ -377,7 +354,7 @@ window.onresize = function () {
     let h = window.innerHeight;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.setSize( w, h );
+    renderer.setSize(w, h);
 }
 
 

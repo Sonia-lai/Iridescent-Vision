@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
 
-    let randomPoints = [], camPosIndex = 0, spline, deltaFlake = 0.5, deltaShake = 1, deltaMove = 1;
+    let randomPoints = [], camPosIndex = 0, spline, deltaRotate = 0.1, deltaFlake = 0.5, deltaShake = 1, deltaMove = 1;
     let upper = 50, lower  = -50;
     this.mode = ''; 
     this.camera = camera
@@ -12,7 +12,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
     this.mesh   = mesh
     this.controls = controls
     this.renderer = renderer
-    this.direction = 'up'
+    this.direction = 'up'   
 
  
 
@@ -69,6 +69,12 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         this.mesh.position.z    += delta
     }
 
+    let faceRotate = () => {
+        this.face.rotation.x += deltaRotate
+        this.face.rotation.y += deltaRotate
+        this.face.rotation.z += deltaRotate
+    }
+
     let maskUp = () => {
 
         if (this.face.position.y < lower && this.direction == 'down') {
@@ -82,7 +88,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             if (upper - lower >= 10) upper -= 5;
             if (deltaMove < 10) deltaMove += 0.5; this.face.position.z -= 0.1;
         }
-
+        
 
         if (this.direction == 'up') {
             this.face.position.x += deltaMove
@@ -92,6 +98,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             this.face.position.y -= deltaMove
         }
     }
+
 
     let faceRotating = () => {
         this.controls.autoRotate = false
@@ -126,6 +133,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
     }
 
     this.update = (controls) => {
+
         if (this.mode == 'idle') {
             controls.update();
             if (controls.autoRotateSpeed < 30) controls.autoRotateSpeed += 0.1
@@ -144,7 +152,8 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             if (controls.autoRotateSpeed < 30) controls.autoRotateSpeed += 0.1
         } else if (this.mode == 'up') {
             removeModelByName('mask')
-            maskUp()
+            faceRotate()
+            deltaRotate += 0.001
         } else if (this.mode == 'rotate') {
             removeModelByName('mask')
             faceRotating()
@@ -161,10 +170,18 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             this.controls.autoRotate = true
             this.controls.enabled = true
         }
-        if (mode == 'up' || mode == 'rotate') this.controls.autoRotate = false
+        if (mode == 'up' ) this.controls.autoRotate = false
         
     }
 
+
+    this.disable = () => {
+        removeModelByName('face')
+        removeModelByName('mask')
+        this.controls.autoRotate = false
+        this.controls.enabled = false
+        this.controls.autoRotateSpeed = 2
+    }
 
     this.enable = () =>  {
         this.changeMode('idle')
