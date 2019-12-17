@@ -7,17 +7,18 @@ import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
 import { SoftVolume } from './SoftVolume';
 import { Background } from './Background'
+import { HeadMove }   from './HeadMove'
 import * as dat from 'dat.gui';
 import { Gravity } from './Gravity'
 import {SoundHandler} from './SoundHandler';
 
 var camera, scene, renderer;
 
-var mesh, face; //model mesh
+var mesh, face, model; //model mesh
 var mouseLight, glassSkin; // use for transparent effect
 var softVolume; // use for softvolume effect
 
-var background, gravity;
+var background, gravity, headmove;
 var controls;
 var directionalLight;
 
@@ -109,7 +110,7 @@ function initModel() {
     let loader = new GLTFLoader();
 
     loader.load(maskPath, gltf => {
-        let model = gltf.scene
+        model = gltf.scene
         model.traverse(child => {
             if (child.isMesh) {
                 child.geometry.rotateY(1.7);
@@ -173,11 +174,9 @@ function animate() {
             camera.position.z -= 1
         }
     }
-    if (controls.autoRotate) {
-        controls.update();
-        if (controls.autoRotateSpeed < 100)  controls.autoRotateSpeed += 0.1
 
-    };
+    if (headmove) headmove.update(controls)
+
     renderer.render(scene, camera);
 }
 
@@ -255,56 +254,14 @@ function testEvent() {
             e.preventDefault();
         }
 
-        if (keyID == 'ArrowLeft') {
-            if (background) {
-                background.direction = 'up'
-            }
-            e.preventDefault();
-        }
-        if (keyID == 'ArrowRight') {
-            if (background) {
-                background.direction = 'down'
-            }
-            e.preventDefault();
-        }
-
-        if (keyID == 'ArrowUp') {
-            if (background) {
-                background.direction = 'forward'
-            }
-            e.preventDefault();
-        }
-        if (keyID == 'ArrowDown') {
-            if (background) {
-                background.direction = 'back'
-            }
-            e.preventDefault();
-        }
-
-        if(keyID == 'KeyZ') {
-            camera.position.set(0, 20, 100);
-            controls.update();
-        }
-
-        if(keyID == 'KeyK') {
-            if (background) {
-                background.scene.fog.far += 10
-                console.log(background.scene.fog.far)
-            }
-
-        }
-        if (keyID == 'KeyL') {
-            if (background) {
-                background.scene.fog.far -= 10
-                console.log(background.scene.fog.far)
-            }
-        }
 
         if(keyID == 'KeyO') {
             if (background) {
                 background.speed += 1
             }
         }
+
+    
         if (keyID == 'KeyP') {
             if (background) {
                 background.speed -= 1
@@ -312,27 +269,25 @@ function testEvent() {
         }
 
         if(keyID == 'KeyI') {
-            coverMeshFace()
+            backgroundFlash()
         }
-        
-        if(keyID == 'KeyM') {
-            randomMove = true
+
+        if (keyID == 'KeyQ') {
+            headmove = new HeadMove(renderer, camera, scene, face, model, mesh, controls)
+            headmove.enable()
         }
-        if (keyID == 'KeyN') {
-            randomMove = false
-            coverMeshFace()
-            controls.autoRotate = false
+        if (keyID == 'KeyW') {
+            headmove.changeMode('shake', camera, face, mesh)
+        }
 
-            face.position.set(2, 0, -15);
-            mesh.position.set(0, 0, 0)
-
-            face.rotation.set(0, Math.PI, 0)
-            mesh.rotation.set(0, 0, 0)
-
-            setTimeout(() => {
-                seperate = true
-            }, 200);
-            
+        if (keyID == 'KeyE') {
+            headmove.changeMode('flake', camera, face, mesh)
+        }
+        if (keyID == 'KeyR') {
+            headmove.changeMode('up', camera, face, mesh)
+        }
+        if (keyID == 'KeyT') {
+            headmove.changeMode('rotate', camera, face, mesh)
         }
 
 
@@ -368,7 +323,6 @@ function testTransparent() {
         background = undefined
     }
     if (softVolume) softVolume.disable();
-    controls.enabled = true;
     directionalLight.intensity = 1;
 
     if (!mouseLight)
@@ -380,12 +334,6 @@ function testTransparent() {
     renderer.setClearColor('#457552');
     directionalLight.intensity = 0.8;
     
-
-    // glassSkin.addTestBackground();
-    // camera.position.set(0, 10, 40);
-    // face.position.set(2, 0, -30);
-    // mesh.position.set(0, 0, 0)
-    controls.autoRotate = true
     glassSkin.enable();
 
     
@@ -413,61 +361,16 @@ function initRandomPoints() {
 }
 
 
-function randomMovement() {
-    controls.autoRotate = false
-
-    camPosIndex += 5;
-    if (camPosIndex > 10000) {
-        camPosIndex = 0;
-    }
-    var camPos = spline.getPoint(camPosIndex / 10000);
-    var camRot = spline.getTangent(camPosIndex / 10000);
-
-
-
-    face.position.x = camPos.x;
-    face.position.y = camPos.y;
-    face.position.z = camPos.z;
-
-    face.rotation.x = camRot.x;
-    face.rotation.y = camRot.y;
-    face.rotation.z = camRot.z;
-
-    mesh.position.x = camPos.x;
-    mesh.position.y = camPos.y;
-    mesh.position.z = camPos.z;
-
-    mesh.rotation.x = camRot.x;
-    mesh.rotation.y = camRot.y;
-    mesh.rotation.z = camRot.z;
-
-    face.lookAt(spline.getPoint((camPosIndex + 1) / 10000));
-    mesh.lookAt(spline.getPoint((camPosIndex + 1) / 10000));
-}
-
-
-
-function separateFaceMesh(delta) {
-
-    controls.autoRotate = true
-
-    // face.position.x -= 1
-    // face.position.y -= 1
-    // face.position.z -= 1
-
-    // mesh.position.x += 1
-    // mesh.position.y += 1
-    mesh.position.z += delta
-}
-
-
-function coverMeshFace() {
+function backgroundFlash() {
     face.visible = false
+    model.visible = false
     mesh.visible = false
+    console.log(model.visible)
     renderer.setClearColor('#FFFFFF');
     setTimeout(() => {
         renderer.setClearColor('#457552');
         face.visible = true
+        model.visible = true
         mesh.visible = true
     }, 100);
 }
