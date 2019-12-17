@@ -193,7 +193,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
             map: texture,
             side: THREE.DoubleSide,
             alphaTest: 0.7,
-            shininess: 30,
+            shininess: 30
             
         } );
         

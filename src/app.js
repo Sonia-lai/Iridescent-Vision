@@ -26,7 +26,9 @@ var soundHandler;
 var spline;
 var camPosIndex = 0;
 var randomPoints = [];
-var start = false
+var randomMove = false
+var seperate   = false
+var delta = 0.5
 
 
 
@@ -115,8 +117,8 @@ function initModel() {
                 child.geometry.translate(0, -30, 0)
                 child.geometry.computeVertexNormals();
                 mesh = child;
+                mesh.name = 'mask'
                 scene.add(mesh);
-
             }
         })
     });
@@ -126,9 +128,29 @@ function initModel() {
         face.position.set(2, 0, -15);
         face.scale.set(0.08, 0.08, 0.08);
         face.rotation.set(0, Math.PI, 0);
+        face.name = 'face'
         scene.add(face);
     });
+
+
 }
+
+function clearObject(obj, scene) {
+    scene.remove(obj);
+    if (obj.geometry) {
+        obj.geometry.dispose()
+    }
+    if (obj.material) {
+        Object.keys(obj.material).forEach(prop => {
+            if (!obj.material[prop])
+                return
+            if (typeof obj.material[prop].dispose === 'function')
+                obj.material[prop].dispose()
+        })
+        obj.material.dispose()
+    }
+}
+
 
 function animate() {
     requestAnimationFrame(animate);
@@ -137,7 +159,20 @@ function animate() {
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
     if (gravity) gravity.update(mesh.position)  
-    // if (start) coverMeshFace()
+    if (randomMove) randomMovement()
+    if (seperate) {
+        separateFaceMesh(delta)
+        delta += 0.01
+        if (delta >= 1) {
+            console.log(scene.children.length)
+            for(var i = 0; i < scene.children.length; i++) {
+                if (scene.children[i].name == 'mask') clearObject(scene.children[i], scene)
+            }
+            controls.autoRotate = false
+            camera.rotation.z += 1
+            camera.position.z -= 1
+        }
+    }
     if (controls.autoRotate) {
         controls.update();
         if (controls.autoRotateSpeed < 100)  controls.autoRotateSpeed += 0.1
@@ -277,10 +312,28 @@ function testEvent() {
         }
 
         if(keyID == 'KeyI') {
-            start = true
-            // coverMeshFace()
+            coverMeshFace()
         }
+        
+        if(keyID == 'KeyM') {
+            randomMove = true
+        }
+        if (keyID == 'KeyN') {
+            randomMove = false
+            coverMeshFace()
+            controls.autoRotate = false
 
+            face.position.set(2, 0, -15);
+            mesh.position.set(0, 0, 0)
+
+            face.rotation.set(0, Math.PI, 0)
+            mesh.rotation.set(0, 0, 0)
+
+            setTimeout(() => {
+                seperate = true
+            }, 200);
+            
+        }
 
 
     }, false);
@@ -329,9 +382,9 @@ function testTransparent() {
     
 
     // glassSkin.addTestBackground();
-    camera.position.set(0, 10, 40);
-    face.position.set(2, 0, -15);
-    mesh.position.set(0, 0, 0)
+    // camera.position.set(0, 10, 40);
+    // face.position.set(2, 0, -30);
+    // mesh.position.set(0, 0, 0)
     controls.autoRotate = true
     glassSkin.enable();
 
@@ -394,17 +447,17 @@ function randomMovement() {
 
 
 
-function separateFaceMesh() {
+function separateFaceMesh(delta) {
 
-    controls.autoRotate = false
+    controls.autoRotate = true
 
     // face.position.x -= 1
     // face.position.y -= 1
-    face.position.z -= 1
+    // face.position.z -= 1
 
     // mesh.position.x += 1
     // mesh.position.y += 1
-    mesh.position.z += 1
+    mesh.position.z += delta
 }
 
 
@@ -413,8 +466,6 @@ function coverMeshFace() {
     mesh.visible = false
     renderer.setClearColor('#FFFFFF');
     setTimeout(() => {
-
-        console.log('start')
         renderer.setClearColor('#457552');
         face.visible = true
         mesh.visible = true
