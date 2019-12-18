@@ -3,12 +3,29 @@ let TextLayer = function(startCallBack) {
     var divElement;
     var spanElement;
     var btnElement;
+
     this.changeText = (text) => {
         spanElement.innerHTML = text;
     }  
 
     this.nowInnerHtml = () => {
         return spanElement.innerHTML;
+    }
+
+    this.addMoreSpan = (text) => {
+        this.changeText(text);
+        spanElement.style.cssText = `
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+            "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+            sans-serif;
+            margin: 1em;
+            width: 80%;
+            text-align: center;
+            font-size: 2em;
+            font-weight: 200;
+            color: rgba(255,255,255,0.4);`
+        divElement.addChild(spanElement);
+        
     }
 
     this.addButton = (text) => {
@@ -41,9 +58,9 @@ let TextLayer = function(startCallBack) {
             margin: 1em;
             width: 80%;
             text-align: center;
-            font-size: 6em;
-            font-weight: 100;
-            color: black;`
+            font-size: 4em;
+            font-weight: 200;
+            color: rgba(255,255,255,0.4);`
         spanElement.innerHTML='0%';
         btnElement = document.createElement('button');
         btnElement.style.cssText = `
@@ -51,14 +68,19 @@ let TextLayer = function(startCallBack) {
             height: 3em;
             margin: 0;
             margin-top: 0.5em;
-            font-size: 3em;
+            font-size: 2em;
             font-weight: 200;
-            color: black;
+            color: rgba(255,255,255,0.4);
             margin: auto;
-            border: 2px solid black;
+            border: 2px solid rgba(255,255,255,0.4);
             background: transparent;
-
         `
+        btnElement.onmouseover = function() {
+            this.style.backgroundColor = "rgba(255,255,255,0.4) ";
+        }
+        btnElement.onmouseout = function() {
+            this.style.backgroundColor = "transparent";
+        }
         btnElement.onclick = this.removeButton;
         divElement.appendChild(spanElement);
         document.body.appendChild(divElement);   

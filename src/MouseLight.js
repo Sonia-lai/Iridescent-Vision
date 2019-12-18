@@ -40,7 +40,7 @@ var MouseLight = function (scene, camera, soundHandler) {
     }
 
     let initSound = () => {
-        player = soundHandler.loadPlayer([light1, light2, light3], 1);
+        player = soundHandler.loadPlayer([light1, light2, light3], 1.5);
     }
     
     // Follows the mouse event
@@ -68,6 +68,7 @@ var MouseLight = function (scene, camera, soundHandler) {
         if (!raycaster || !light || !mesh) return;
         if (!mouseMove && player) {
             if (player[playerOrder].state !== 'stopped') {
+                //console.log('stop!', playerOrder);
                 player[playerOrder].stop();
                 playerOrder = (playerOrder+1)%3;
             }
@@ -84,12 +85,16 @@ var MouseLight = function (scene, camera, soundHandler) {
                 light.angle += this.angleStep; 
             }
             target.position.copy(intersects[0].point);
+            //console.log('player', player);
             if (player) {
+                //console.log('play!', playerOrder, player[playerOrder].loaded);
                 if (player[playerOrder].loaded)
                     player[playerOrder].start();
             }    
         } else {
+            
             if (player[playerOrder].state !== 'stopped') {
+                //console.log('stop!', playerOrder);
                 player[playerOrder].stop();
                 playerOrder = (playerOrder+1)%3;
             }

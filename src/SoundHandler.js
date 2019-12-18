@@ -29,7 +29,8 @@ let SoundHandler = function(onProgress){
                 loaded += 1;
                 this.onProgress(loaded);
             }).toMaster();
-            p.fadeout = fadeout;
+            p.fadeOut = fadeout;
+            console.log(p, p.fadeout);
             playerList.push(p);
             
         })

@@ -42,7 +42,6 @@ animate();
 
 function initSound() {
     soundHandler = new SoundHandler(soundOnProgress);
-    //return;
     //call soundHandler.play() when click?
     soundHandler.schedule(() => {
         //console.log('start');
@@ -58,85 +57,108 @@ function initSound() {
             count += 1
             if (count > 10) { clearInterval(interval) }
         }, 100);
-    //}, 0, 32.5);
-    }, 0, 29);
 
-    soundHandler.schedule(() => {
-        // console.log('change to gravity');
-            
         if (softVolume) {
             softVolume.disable();
             softVolume.dispose();
             softVolume = undefined;
         }
-        gravity = new Gravity(scene, mesh, soundHandler);
+        //gravity = new Gravity(scene, mesh, soundHandler);
         gravity.enable()
         background.direction = 'up'
-        
-    //}, 0, 33);
-    }, 0, 29.5);
+        bumpFlash();
+    }, 0, 29);
 
-    soundHandler.schedule(() => {
-        var count = 0
-        var interval = setInterval(() => {
-            flash()
-            count += 1
-            if (count > 10) {clearInterval(interval)}
-        }, 100);
-    //}, 0, 48.5)
-    }, 0, 40);
+   // return;
+    
+    let bumpFlash = () => {
+        soundHandler.schedule(() => {
+            var count = 0
+            var interval = setInterval(() => {
+                flash()
+                count += 1
+                if (count > 10) {clearInterval(interval)}
+            }, 100);
+            speedupBg();
+        //}, 0, 48.5)
+        }, 0, 50);
+    }
 
-    soundHandler.schedule(() => {
-        if (background) {
-            background.speedup = true
-        }
-    //}, 1, 6)
-    }, 1, 3);
+    let speedupBg = () => {
+        soundHandler.schedule(() => {
+            if (background) {
+                background.speedup = true
+            }
+        //}, 1, 6)
+        }, 0, 59);
+        gravity2Glass();
+    }
+    
+    let gravity2Glass = () => {
+        soundHandler.schedule(() => {
+            // console.log('change to transparent');
+            gravity.disable()
+            gravity = null
+            testTransparent();
+            headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
+            headmove.enable(camera, face, mesh)
+        //}, 1, 10);
+        }, 1, 6);
+        shakeHead();
+    }
+    
+    let shakeHead = () =>{
+        soundHandler.schedule(() => {
+            if (mouseLight) mouseLight.disable();
+    
+            headmove.changeMode('shake', camera, face, mesh)
+            // console.log('seperate mask and head?');
+        }, 1, 37);
+        headFlake();
+    }
+    
+    let headFlake = () => {
+        soundHandler.schedule(() => {
+            headmove.changeMode('flake', camera, face, mesh)
+        }, 1, 51);
+        headUp();
+    }
 
-    soundHandler.schedule(() => {
-        // console.log('change to transparent');
-        
-        gravity.disable()
-        gravity = null
-        testTransparent();
-        headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
-        headmove.enable(camera, face, mesh)
-    //}, 1, 10);
-    }, 1, 7);
+    let headUp = () => {
+        soundHandler.schedule(() => {
+            headmove.changeMode('up', camera, face, mesh)
+        }, 1, 57);
+        shakeHead2();
+    }
 
-    soundHandler.schedule(() => {
-        if (mouseLight) mouseLight.disable();
+    let shakeHead2 = () => {
+        soundHandler.schedule(() => {
+            headmove.changeMode('shake', camera, face, mesh)
+        }, 2, 2);
+        rotateHead();
+    }
 
-        headmove.changeMode('shake', camera, face, mesh)
-        // console.log('seperate mask and head?');
-    }, 1, 40);
+    let rotateHead = () => {
+        soundHandler.schedule(() => {
+            headmove.changeMode('rotate', camera, face, mesh)
+        }, 2, 5);
+        showActivity();
+    }
 
+    let showActivity = () => {
+        soundHandler.schedule(() => {
+            directionalLight.intensity = 1
+            if (headmove) {
+                headmove.disable()
+                headmove = undefined
+            }
+            activity = new Activity(camera, scene, controls)
+            activity.enable();
+            //textLayer.addMoreSpan('MORE');
+        }, 2, 8);
+    }    
 
-    soundHandler.schedule(() => {
-        headmove.changeMode('flake', camera, face, mesh)
-    }, 1, 55);
-
-    soundHandler.schedule(() => {
-        headmove.changeMode('up', camera, face, mesh)
-    }, 1, 57);
-
-    soundHandler.schedule(() => {
-        headmove.changeMode('shake', camera, face, mesh)
-    }, 2, 0);
-
-    soundHandler.schedule(() => {
-        headmove.changeMode('rotate', camera, face, mesh)
-    }, 2, 9.5);
-
-    soundHandler.schedule(() => {
-        directionalLight.intensity = 1
-        if (headmove) {
-            headmove.disable()
-            headmove = undefined
-        }
-        activity = new Activity(camera, scene, controls)
-        activity.enable()
-    }, 2, 12);
+    
 }
 
 function init() {

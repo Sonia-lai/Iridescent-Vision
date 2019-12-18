@@ -23,7 +23,6 @@ var GlassSkin = function(scene, mesh) {
         cubeCamera.renderTarget.texture.mapping = THREE.CubeRefractionMapping;
         cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.93} );
         this.mesh.material = cubeMaterial;
-        console.log('init glass');
     }
     
     

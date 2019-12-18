@@ -128,7 +128,7 @@ var Gravity = function (scene, mesh, soundHandler) {
         var force, m;
         var r = 3;
         let applyN = this.applyN
-         let center = new Vec3(pos.x, pos.y, pos.z);
+        let center = new Vec3(pos.x, pos.y, pos.z);
         let all    = this.all
 
         bodys.forEach(function (b, id) {
@@ -144,11 +144,10 @@ var Gravity = function (scene, mesh, soundHandler) {
                 } 
                 b.applyImpulse(center, force);
 
-            } else {
-                b.setPosition(center);
-            }
+            } 
 
         });
+        centerBody.setPosition(center);
         if (this.applyN) this.applyN = false;
         if (this.all) this.all = false
     }
