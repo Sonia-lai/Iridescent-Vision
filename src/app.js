@@ -234,16 +234,10 @@ function testEvent() {
 
         if (keyID == 'KeyO') {
             if (background) {
-                background.speed += 1
+                background.speedup = true
             }
         }
 
-
-        if (keyID == 'KeyP') {
-            if (background) {
-                background.speed -= 1
-            }
-        }
 
         if (keyID == 'KeyI') {
             if (background) backgroundFlash('#343161')

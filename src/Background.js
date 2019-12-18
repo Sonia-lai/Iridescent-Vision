@@ -4,13 +4,14 @@ var Background = function (renderer, scene) {
     let ambientLight, hemiLight
     let Building = require('./background/building').default;
     let bldgs  = []
-    
+    let delta_speed = 0
     let bldgColor = 0x8e57b5, lightColor = 0x444444, skyColor = 0x343161, recoverColor = 0xFFFFFF,
         chunkSize = 200, chunksAtATime = 6, lgBldgSize = 12;
 
-    
+
+    this.speedup = false
     this.scene = scene;
-    this.direction = 'forward'
+    this.direction = 'up'
     this.speed = 0.05;
     this.fogDistance = 10; 
     this.brightness  = 0.1;
@@ -22,6 +23,13 @@ var Background = function (renderer, scene) {
         if (this.scene.fog.far <= 720) {
             if (scene.fog.far <= 100) this.scene.fog.far += 0.5
             else this.scene.fog.far += 1
+        }
+
+        if (this.speedup) {
+            if (this.speed < 500) delta_speed += 0.001
+            else speedup = false
+            this.speed += delta_speed
+            
         }
     }
     
