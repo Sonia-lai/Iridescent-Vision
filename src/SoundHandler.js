@@ -6,7 +6,7 @@ let SoundHandler = function(onProgress){
     var loaded = 0;
     //var players = [];
     var player = new Tone.Player(bgm, function(){
-        console.log('bgm ready!');
+        // console.log('bgm ready!');
         player.sync().start(0);
         loaded += 1;
         onProgress(loaded);

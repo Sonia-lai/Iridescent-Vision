@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { DirectionalLight } from 'three/build/three.module';
 
 
 var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
@@ -22,11 +23,16 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         this.controls.autoRotate = false
 
         camera.position.set(0, 10, 40);
-        face.position.set(2, 0, -30);
+        
         mesh.position.set(0, 0, 0)
-
-        face.rotation.set(0, Math.PI, 0)
         mesh.rotation.set(0, 0, 0)
+
+        face.position.set(2, 0, -15);
+        face.scale.set(0.08, 0.08, 0.08);
+        face.rotation.set(0, Math.PI, 0)
+    
+
+
         this.controls.autoRotate = true
 
     }
@@ -132,11 +138,13 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         }
     }
 
-    this.update = (controls) => {
+    this.update = (controls, directionalLight) => {
 
         if (this.mode == 'idle') {
             controls.update();
-            if (controls.autoRotateSpeed < 30) controls.autoRotateSpeed += 0.1
+            if (controls.autoRotateSpeed < 20) controls.autoRotateSpeed += 0.1
+            if (directionalLight.intensity < 0.8) directionalLight.intensity += 0.001
+            console.log(directionalLight.intensity)
         } else if (this.mode == 'shake') {
             headShaking(deltaShake)
             if (deltaShake < 5) {
@@ -183,8 +191,9 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         this.controls.autoRotateSpeed = 2
     }
 
-    this.enable = () =>  {
+    this.enable = (camera, face, mesh) =>  {
         this.changeMode('idle')
+        resetPos(camera, face, mesh)
     }
      
 

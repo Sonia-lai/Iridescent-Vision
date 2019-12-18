@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {Particle} from './Particle';
 import { Vector3, Mesh } from 'three/build/three.module';
+import pattern from './images/circuit_pattern.png'
 import * as dat from 'dat.gui';
 import pullSound from './sounds/mask_pull.mp3';
 import releaseSound from './sounds/mask_release.mp3';
@@ -213,7 +214,7 @@ var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
 
     let changeTexture = () => {
         var textureLoader = new THREE.TextureLoader();
-        var texture = textureLoader.load( "https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png" );
+        var texture = textureLoader.load(pattern);
 
         let MeshMaterial = new THREE.MeshPhongMaterial( {
             color: 0x624eba,

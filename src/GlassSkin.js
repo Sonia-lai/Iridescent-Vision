@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-
 var GlassSkin = function(scene, mesh) {
     
     this.scene = scene;
@@ -23,7 +22,11 @@ var GlassSkin = function(scene, mesh) {
     
         cubeCamera.renderTarget.texture.mapping = THREE.CubeRefractionMapping;
         cubeMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget.texture, refractionRatio: 0.93} );
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> cd54459c7f327eb5204a2e6be64406d1872db6d9
         this.mesh.material = cubeMaterial;
         console.log('init glass');
     }

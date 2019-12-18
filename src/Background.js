@@ -4,24 +4,33 @@ var Background = function (renderer, scene) {
     let ambientLight, hemiLight
     let Building = require('./background/building').default;
     let bldgs  = []
-    
+    let delta_speed = 0
     let bldgColor = 0x8e57b5, lightColor = 0x444444, skyColor = 0x343161, recoverColor = 0xFFFFFF,
         chunkSize = 200, chunksAtATime = 6, lgBldgSize = 12;
 
-    
+
+    this.speedup = false
     this.scene = scene;
     this.direction = 'forward'
     this.speed = 0.05;
     this.fogDistance = 10; 
     this.brightness  = 0.1;
-
+    this.enabled = false
     this.uuid = []
 
     this.update = (camera, mesh, face) => {
+        if (!this.enabled) return 
         backgroundUpdate(camera, mesh, face)
         if (this.scene.fog.far <= 720) {
             if (scene.fog.far <= 100) this.scene.fog.far += 0.5
             else this.scene.fog.far += 1
+        }
+
+        if (this.speedup) {
+            if (this.speed < 500) delta_speed += 0.001
+            else speedup = false
+            this.speed += delta_speed
+            
         }
     }
     
@@ -29,11 +38,34 @@ var Background = function (renderer, scene) {
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
             if (!this.uuid.includes(obj.uuid)) {
-                clearObject(obj, this.scene)
+                doDispose(obj, this.scene)
             }
 
         }
         renderer.setClearColor(new THREE.Color(recoverColor))
+        this.enabled = false
+    }
+
+    function doDispose(obj, scene) {
+        scene.remove(obj);
+        if (obj !== null) {
+            for (var i = 0; i < obj.children.length; i++) {
+                doDispose(obj.children[i]);
+            }
+            if (obj.geometry) {
+                obj.geometry.dispose();
+                obj.geometry = undefined;
+            }
+            if (obj.material) {
+                if (obj.material.map) {
+                    obj.material.map.dispose();
+                    obj.material.map = undefined;
+                }
+                obj.material.dispose();
+                obj.material = undefined;
+            }
+        }
+        obj = undefined;
     }
 
     function clearObject(obj, scene) {
@@ -51,21 +83,13 @@ var Background = function (renderer, scene) {
             obj.material.dispose()
         }
     }
-    
 
-    function randomInt(min, max) {
-        return Math.floor(Math.random() * (max - min)) + min;
-    }
-
-    function randomAngle() {
-        return Math.floor(Math.random() * 360);
-    }
 
 
     function forestGenerate(zMove) {
         var buildings = []
 
-        for(var i = 0; i < 200;i++) {
+        for(var i = 0; i < 200; i++) {
             var x = Math.random() * 1000 - 500
             var y = Math.random() * 100 - 50
             var z = Math.random() * 100 - 50
@@ -139,6 +163,10 @@ var Background = function (renderer, scene) {
         this.scene.fog = new THREE.Fog(skyColor, 0.01, this.fogDistance);
         
 
+    }
+
+    this.enable = () => {
+        this.enabled = true
     }
 
     initBackground(renderer, scene)
