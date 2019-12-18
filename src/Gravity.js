@@ -149,7 +149,6 @@ var Gravity = function (scene, mesh) {
         let MeshMaterial = new THREE.MeshStandardMaterial({
             color: 0xebaf09,
             emissive: 0xc325e,
-            specular: 0x441833,
             map: texture,
             side: THREE.DoubleSide,
             roughness: 0.32,
@@ -178,13 +177,35 @@ var Gravity = function (scene, mesh) {
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
             if (!this.uuid.includes(obj.uuid)) {
-                clearObject(obj, this.scene)
+                doDispose(obj, this.scene)
             }
 
         }
 
         document.removeEventListener('click', applyForce, false);
         document.removeEventListener('dblclick', applyAllForce, false)
+    }
+
+    function doDispose(obj, scene) {
+        scene.remove(obj);
+        if (obj !== null) {
+            for (var i = 0; i < obj.children.length; i++) {
+                doDispose(obj.children[i]);
+            }
+            if (obj.geometry) {
+                obj.geometry.dispose();
+                obj.geometry = undefined;
+            }
+            if (obj.material) {
+                if (obj.material.map) {
+                    obj.material.map.dispose();
+                    obj.material.map = undefined;
+                }
+                obj.material.dispose();
+                obj.material = undefined;
+            }
+        }
+        obj = undefined;
     }
 
     function clearObject(obj, scene) {
@@ -218,6 +239,8 @@ var Gravity = function (scene, mesh) {
             })
             obj.material.dispose()
         }
+
+        obj = undefined
     }
 
     this.update = (pos) => {

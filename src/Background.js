@@ -38,12 +38,34 @@ var Background = function (renderer, scene) {
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
             if (!this.uuid.includes(obj.uuid)) {
-                clearObject(obj, this.scene)
+                doDispose(obj, this.scene)
             }
 
         }
         renderer.setClearColor(new THREE.Color(recoverColor))
         this.enabled = false
+    }
+
+    function doDispose(obj, scene) {
+        scene.remove(obj);
+        if (obj !== null) {
+            for (var i = 0; i < obj.children.length; i++) {
+                doDispose(obj.children[i]);
+            }
+            if (obj.geometry) {
+                obj.geometry.dispose();
+                obj.geometry = undefined;
+            }
+            if (obj.material) {
+                if (obj.material.map) {
+                    obj.material.map.dispose();
+                    obj.material.map = undefined;
+                }
+                obj.material.dispose();
+                obj.material = undefined;
+            }
+        }
+        obj = undefined;
     }
 
     function clearObject(obj, scene) {

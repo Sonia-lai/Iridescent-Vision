@@ -172,6 +172,8 @@ function testEvent() {
             if (gravity) {
                 gravity.disable()
                 gravity = null
+                
+                // console.log(renderer)
             }
             testTransparent();
             e.preventDefault();
@@ -182,7 +184,7 @@ function testEvent() {
                 gravity = null
             }
             if (mouseLight) mouseLight.disable();
-            if (glassSkin) glassSkin.disable();
+            if (gSkin) glassSkin.disable();
             testSoft();
             e.preventDefault();
         }
