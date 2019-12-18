@@ -126,7 +126,7 @@ function initSound() {
 
     soundHandler.schedule(() => {
         headmove.changeMode('rotate', camera, face, mesh)
-    }, 2, 10);
+    }, 2, 9.5);
 
     soundHandler.schedule(() => {
         directionalLight.intensity = 1
