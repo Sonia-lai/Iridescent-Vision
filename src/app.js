@@ -13,9 +13,6 @@ import * as dat from 'dat.gui';
 import { Gravity } from './Gravity'
 import { SoundHandler } from './SoundHandler';
 
-// import bgImage from './images/poster.jpg'
-// import linkImage from './images/sonia.jpg'
-
 var camera, scene, renderer;
 
 var mesh, face; //model mesh
@@ -25,11 +22,6 @@ var softVolume; // use for softvolume effect
 var background, gravity, headmove, activity;
 var controls;
 var directionalLight;
-
-// var raycaster = new THREE.Raycaster(), INTERSECTED;
-// var mouse = new THREE.Vector2();
-// var eventType, sphere;
-
 var soundHandler;
 
 
@@ -41,14 +33,14 @@ function initSound() {
     soundHandler = new SoundHandler();
     //call soundHandler.play() when click?
     soundHandler.schedule(() => {
-        console.log('start');
+        // console.log('start');
         testSoft();
         testBackground();
         controls.enable = false;
     }, 0, 0);
 
     soundHandler.schedule(() => {
-        console.log('change to gravity');
+        // console.log('change to gravity');
         if (softVolume) softVolume.disable();
         gravity = new Gravity(scene, mesh, soundHandler);
         gravity.enable()
@@ -57,13 +49,14 @@ function initSound() {
     }, 0, 30);
 
     soundHandler.schedule(() => {
-        console.log('change to transparent');
+        // console.log('change to transparent');
         gravity.disable()
+        gravity = null
         testTransparent();
     }, 1, 9);
 
     soundHandler.schedule(() => {
-        console.log('seperate mask and head?');
+        // console.log('seperate mask and head?');
     }, 1, 38);
 
     soundHandler.schedule(() => {
@@ -72,13 +65,15 @@ function initSound() {
 }
 
 function init() {
-    initSound();
 
     let width = window.innerWidth
     let height = window.innerHeight
+    
+    intDocument()
+    initSound();
+
 
     scene = new THREE.Scene();
-
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
     camera.position.set(0, 10, 40);
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -90,6 +85,7 @@ function init() {
     initLight()
     initModel()
 
+    console.log(renderer)
 
 
     document.body.appendChild(renderer.domElement);
@@ -99,6 +95,11 @@ function init() {
 
 }
 
+
+
+function intDocument () {
+    document.querySelector('body').style.margin = "0px"; 
+}
 
 
 
@@ -160,28 +161,29 @@ function animate() {
 function testEvent() {
     window.addEventListener('keydown', function (e) {
         var keyID = e.code;
-        console.log(keyID);
         if (keyID === 'KeyA') {
             if (background) {
                 background.disable()
-                background = undefined
+                background = null
             }
 
             if (softVolume) softVolume.disable();
             if (gravity) {
                 gravity.disable()
-                gravity = undefined
+                gravity = null
+                
+                // console.log(renderer)
             }
             testTransparent();
             e.preventDefault();
         }
         if (keyID == 'KeyB') {
-            if (mouseLight) mouseLight.disable();
-            if (glassSkin) glassSkin.disable();
             if (gravity) {
                 gravity.disable()
-                gravity = undefined
+                gravity = null
             }
+            if (mouseLight) mouseLight.disable();
+            if (gSkin) glassSkin.disable();
             testSoft();
             e.preventDefault();
         }
@@ -189,7 +191,7 @@ function testEvent() {
             testOrigin();
             if (gravity) {
                 gravity.disable()
-                gravity = undefined
+                gravity = null
             }
             e.preventDefault();
         }
@@ -198,7 +200,7 @@ function testEvent() {
             if (glassSkin) glassSkin.disable();
             if (gravity) {
                 gravity.disable()
-                gravity = undefined
+                gravity = null
             }
             testBackground();
             e.preventDefault();
@@ -233,24 +235,19 @@ function testEvent() {
 
         if (keyID == 'KeyO') {
             if (background) {
-                background.speed += 1
+                background.speedup = true
             }
         }
 
-
-        if (keyID == 'KeyP') {
-            if (background) {
-                background.speed -= 1
-            }
-        }
 
         if (keyID == 'KeyI') {
-            backgroundFlash()
+            if (background) backgroundFlash('#343161')
+            else backgroundFlash('#457552')
         }
 
         if (keyID == 'KeyQ') {
             headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
-            headmove.enable()
+            headmove.enable(camera, face, mesh)
         }
         if (keyID == 'KeyW') {
             headmove.changeMode('shake', camera, face, mesh)
@@ -287,6 +284,7 @@ function testBackground() {
 
     if (!background) {
         background = new Background(renderer, scene);
+        background.enable()
     }
     else {
         background.disable()
@@ -337,12 +335,18 @@ function testSoft() {
 }
 
 
-function backgroundFlash() {
+function backgroundFlash(color) {
     face.visible = false
     mesh.visible = false
-    renderer.setClearColor('#FFFFFF');
+    if (Math.floor(Math.random() * 2)) {
+        renderer.setClearColor('#17202A');
+    } else {
+        renderer.setClearColor('#FFFFFF');
+    }
+
+    
     setTimeout(() => {
-        renderer.setClearColor('#457552');
+        renderer.setClearColor(color);
         face.visible = true
         mesh.visible = true
     }, 100);

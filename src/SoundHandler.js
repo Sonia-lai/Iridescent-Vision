@@ -3,7 +3,7 @@ import bgm from './sounds/bgm.mp3';
 
 let SoundHandler = function(){
     var player = new Tone.Player(bgm, function(){
-        console.log('bgm ready!');
+        // console.log('bgm ready!');
         player.sync().start(0);
     }).toMaster();
     

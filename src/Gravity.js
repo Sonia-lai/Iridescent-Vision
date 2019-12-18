@@ -26,14 +26,13 @@ var Gravity = function (scene, mesh, soundHandler) {
     const ROLL = 2;
 
     let world;
+    let size = 150;
+    this.uuid = []
     let bodys = [];
     let centerBody;
-    let size = 200;
     let player;
-    //let collidePlayer, flyPlayer;
-    //let playerLoad = 0;
+    let oriMaterial = mesh.material;
 
-    this.uuid = []
 
     this.applyN = true;
     this.scene  = scene;
@@ -125,9 +124,8 @@ var Gravity = function (scene, mesh, soundHandler) {
         let MeshMaterial = new THREE.MeshStandardMaterial({
             color: 0xffe6e6,
             side: THREE.DoubleSide,
-            alphaTest: 0.7,
-            });
-
+            alphaTest: 0.7
+        });
 
         if (!noMesh) {
             
@@ -147,8 +145,7 @@ var Gravity = function (scene, mesh, soundHandler) {
         var force, m;
         var r = 3;
         let applyN = this.applyN
-        //let center = this.center
-        let center = new Vec3(pos.x, pos.y, pos.z);
+         let center = new Vec3(pos.x, pos.y, pos.z);
         let all    = this.all
 
         bodys.forEach(function (b, id) {
@@ -220,19 +217,62 @@ var Gravity = function (scene, mesh, soundHandler) {
 
     this.disable = () => {
         this.enabled = false
-        world.stop()
-
+        world.clear()
+        world = undefined
+        bodys = undefined
+        this.mesh.material =    oriMaterial;
+        oriMaterial = undefined
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
             if (!this.uuid.includes(obj.uuid)) {
-                clearObject(obj, this.scene)
+                doDispose(obj, this.scene)
             }
 
         }
+
+        document.removeEventListener('click', applyForce, false);
+        document.removeEventListener('dblclick', applyAllForce, false)
+    }
+
+    function doDispose(obj, scene) {
+        scene.remove(obj);
+        if (obj !== null) {
+            for (var i = 0; i < obj.children.length; i++) {
+                doDispose(obj.children[i]);
+            }
+            if (obj.geometry) {
+                obj.geometry.dispose();
+                obj.geometry = undefined;
+            }
+            if (obj.material) {
+                if (obj.material.map) {
+                    obj.material.map.dispose();
+                    obj.material.map = undefined;
+                }
+                obj.material.dispose();
+                obj.material = undefined;
+            }
+        }
+        obj = undefined;
     }
 
     function clearObject(obj, scene) {
         scene.remove(obj);
+
+
+        if (obj.material) {
+            if (obj.material.length) {
+                for (let i = 0; i < obj.material.length; ++i) {
+                    obj.material[i].dispose()
+                }
+            }
+            else {
+                obj.material.dispose()
+            }
+        }
+
+
+
         if (obj.geometry) {
             obj.geometry.dispose()
         }
@@ -240,11 +280,15 @@ var Gravity = function (scene, mesh, soundHandler) {
             Object.keys(obj.material).forEach(prop => {
                 if (!obj.material[prop])
                     return
-                if (typeof obj.material[prop].dispose === 'function')
+                if (typeof obj.material[prop].dispose === 'function'){
                     obj.material[prop].dispose()
+                }
+
             })
             obj.material.dispose()
         }
+
+        obj = undefined
     }
 
     this.update = (pos) => {
@@ -266,8 +310,6 @@ var Gravity = function (scene, mesh, soundHandler) {
             player[FLY].start();
     }
 
-    document.addEventListener('click'   , applyForce, false);
-    document.addEventListener('dblclick', applyAllForce, false)
 
     init()
 }
