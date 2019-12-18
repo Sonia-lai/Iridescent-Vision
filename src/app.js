@@ -337,7 +337,13 @@ function testSoft() {
 function backgroundFlash(color) {
     face.visible = false
     mesh.visible = false
-    renderer.setClearColor('#FFFFFF');
+    if (Math.floor(Math.random() * 2)) {
+        renderer.setClearColor('#17202A');
+    } else {
+        renderer.setClearColor('#FFFFFF');
+    }
+
+    
     setTimeout(() => {
         renderer.setClearColor(color);
         face.visible = true
