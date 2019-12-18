@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { DirectionalLight } from 'three/build/three.module';
 
 
 var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
@@ -137,11 +138,13 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         }
     }
 
-    this.update = (controls) => {
+    this.update = (controls, directionalLight) => {
 
         if (this.mode == 'idle') {
             controls.update();
-            // if (controls.autoRotateSpeed < 30) controls.autoRotateSpeed += 0.1
+            if (controls.autoRotateSpeed < 20) controls.autoRotateSpeed += 0.1
+            if (directionalLight.intensity < 0.8) directionalLight.intensity += 0.001
+            console.log(directionalLight.intensity)
         } else if (this.mode == 'shake') {
             headShaking(deltaShake)
             if (deltaShake < 5) {

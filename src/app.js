@@ -12,6 +12,7 @@ import {Activity} from './Activity'
 import * as dat from 'dat.gui';
 import { Gravity } from './Gravity'
 import { SoundHandler } from './SoundHandler';
+import domeImage from './images/gradient.jpeg'
 
 var camera, scene, renderer;
 
@@ -85,8 +86,13 @@ function init() {
     initLight()
     initModel()
 
-    console.log(renderer)
 
+    var geometry = new THREE.SphereGeometry(100000, 25, 25);
+    var texture = new THREE.TextureLoader().load(domeImage);
+    var material = new THREE.MeshBasicMaterial({ map: texture });
+    var sphere = new THREE.Mesh(geometry, material);
+    sphere.material.side = THREE.BackSide;
+    scene.add(sphere);
 
     document.body.appendChild(renderer.domElement);
     testEvent();
@@ -149,7 +155,7 @@ function animate() {
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
     if (gravity) gravity.update(mesh.position)
-    if (headmove) headmove.update(controls)
+    if (headmove) headmove.update(controls, directionalLight)
     if (activity) activity.update(camera)
 
     renderer.render(scene, camera);
@@ -171,8 +177,6 @@ function testEvent() {
             if (gravity) {
                 gravity.disable()
                 gravity = null
-                
-                // console.log(renderer)
             }
             testTransparent();
             e.preventDefault();
@@ -315,9 +319,12 @@ function testTransparent() {
     if (!glassSkin)
         glassSkin = new GlassSkin(scene, mesh);
 
-    renderer.setClearColor('#457552');  
-    directionalLight.intensity = 0.8;
+    const loader = new THREE.TextureLoader();
+    const bgTexture = loader.load(domeImage);
+    scene.background = bgTexture;
 
+    directionalLight.intensity = 0;
+    
     glassSkin.enable();
 
 
@@ -346,6 +353,7 @@ function backgroundFlash(color) {
 
     
     setTimeout(() => {
+        
         renderer.setClearColor(color);
         face.visible = true
         mesh.visible = true
