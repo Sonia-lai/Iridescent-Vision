@@ -24,7 +24,7 @@ var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
     
     this.pullTo = -2;
     this.constraintTime = 2;
-    this.timeoutms = 3000;
+    this.timeoutms = 2500;
     this.soundHandler = soundHandler;
     
     //private variable

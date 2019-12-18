@@ -3,6 +3,7 @@ let TextLayer = function(startCallBack) {
 
     var divElement;
     var spanElement;
+    var spanElement2;
     var btnElement;
 
     this.changeText = (text) => {
@@ -31,12 +32,17 @@ let TextLayer = function(startCallBack) {
 
     this.addButton = (text) => {
         divElement.removeChild(spanElement);
+        divElement.removeChild(spanElement2);
         btnElement.innerHTML = text;
         divElement.appendChild(btnElement);
+        divElement.appendChild(spanElement2);
     }
 
     this.removeButton = () => {
         divElement.removeChild(btnElement);
+        if(navigator.userAgent.indexOf("Chrome") != -1 ) {
+            divElement.removeChild(spanElement2);
+        }
         if (startCallBack) startCallBack();
     }
 
@@ -75,12 +81,20 @@ let TextLayer = function(startCallBack) {
             font-weight: 200;
             color: rgba(255,255,255,0.4);`
         spanElement.innerHTML='0%';
+        spanElement2 = document.createElement('span');
+        spanElement2.style.cssText = `
+            margin: 1em;
+            width: 80%;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 200;
+            color: rgba(255,255,255,0.3);`
+        spanElement2.innerHTML='use Chrome for best experience';
         btnElement = document.createElement('button');
         btnElement.style.cssText = `
             font-family: 'Dancing Script', cursive;
             width: 7em;
             height: 3em;
-            margin: 0;
             margin-top: 0.5em;
             font-size: 2em;
             font-weight: 200;
@@ -97,6 +111,7 @@ let TextLayer = function(startCallBack) {
         }
         btnElement.onclick = this.removeButton;
         divElement.appendChild(spanElement);
+        divElement.appendChild(spanElement2);
         document.body.appendChild(divElement);   
     }
     init();

@@ -81,7 +81,7 @@ function initSound() {
             }, 100);
             speedupBg();
         //}, 0, 48.5)
-        }, 0, 50);
+        }, 0, 50.5);
     }
 
     let speedupBg = () => {
@@ -90,7 +90,7 @@ function initSound() {
                 background.speedup = true
             }
         //}, 1, 6)
-        }, 0, 59);
+        }, 0, 60.5);
         gravity2Glass();
     }
     
@@ -103,7 +103,7 @@ function initSound() {
             headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
             headmove.enable(camera, face, mesh)
         //}, 1, 10);
-        }, 1, 6);
+        }, 1, 6.5);
         shakeHead();
     }
     
@@ -113,35 +113,35 @@ function initSound() {
     
             headmove.changeMode('shake', camera, face, mesh)
             // console.log('seperate mask and head?');
-        }, 1, 37);
+        }, 1, 40);
         headFlake();
     }
     
     let headFlake = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('flake', camera, face, mesh)
-        }, 1, 51);
+        }, 1, 53.5);
         headUp();
     }
 
     let headUp = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('up', camera, face, mesh)
-        }, 1, 57);
+        }, 2, 0);
         shakeHead2();
     }
 
     let shakeHead2 = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('shake', camera, face, mesh)
-        }, 2, 2);
+        }, 2, 4.5);
         rotateHead();
     }
 
     let rotateHead = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('rotate', camera, face, mesh)
-        }, 2, 5);
+        }, 2, 7);
         showActivity();
     }
 
@@ -155,7 +155,7 @@ function initSound() {
             activity = new Activity(camera, scene, controls)
             activity.enable();
             //textLayer.addMoreSpan('MORE');
-        }, 2, 8);
+        }, 2, 9);
     }    
 
     
@@ -190,9 +190,7 @@ function init() {
     
 
     document.body.appendChild(renderer.domElement);
-    testEvent();
-
-
+    //testEvent();
 }
 
 

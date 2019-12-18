@@ -13,7 +13,7 @@ var Gravity = function (scene, mesh, soundHandler) {
     const ROLL = 2;
 
     let world;
-    let size = 120;
+    let size = 80;
     this.uuid = []
     let bodys = [];
     let centerBody;

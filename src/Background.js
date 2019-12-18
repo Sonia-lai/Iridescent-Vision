@@ -22,7 +22,7 @@ var Background = function (renderer, scene) {
         if (!this.enabled) return 
         backgroundUpdate(camera, mesh, face)
         if (this.scene.fog.far <= 720) {
-            if (scene.fog.far <= 100) this.scene.fog.far += 0.5
+            if (scene.fog.far <= 100) this.scene.fog.far += 3
             else this.scene.fog.far += 1
         }
 
@@ -89,8 +89,8 @@ var Background = function (renderer, scene) {
     function forestGenerate(zMove) {
         var buildings = []
 
-        for(var i = 0; i < 200; i++) {
-            var x = Math.random() * 1000 - 500
+        for(var i = 0; i < 30; i++) {
+            var x = Math.random() * 600 - 300
             var y = Math.random() * 100 - 50
             var z = Math.random() * 100 - 50
             var d = Math.random() * 20  + 30
