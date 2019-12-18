@@ -15,10 +15,11 @@ var Background = function (renderer, scene) {
     this.speed = 0.05;
     this.fogDistance = 10; 
     this.brightness  = 0.1;
-
+    this.enabled = false
     this.uuid = []
 
     this.update = (camera, mesh, face) => {
+        if (!this.enabled) return 
         backgroundUpdate(camera, mesh, face)
         if (this.scene.fog.far <= 720) {
             if (scene.fog.far <= 100) this.scene.fog.far += 0.5
@@ -42,6 +43,7 @@ var Background = function (renderer, scene) {
 
         }
         renderer.setClearColor(new THREE.Color(recoverColor))
+        this.enabled = false
     }
 
     function clearObject(obj, scene) {
@@ -59,21 +61,13 @@ var Background = function (renderer, scene) {
             obj.material.dispose()
         }
     }
-    
 
-    function randomInt(min, max) {
-        return Math.floor(Math.random() * (max - min)) + min;
-    }
-
-    function randomAngle() {
-        return Math.floor(Math.random() * 360);
-    }
 
 
     function forestGenerate(zMove) {
         var buildings = []
 
-        for(var i = 0; i < 200;i++) {
+        for(var i = 0; i < 200; i++) {
             var x = Math.random() * 1000 - 500
             var y = Math.random() * 100 - 50
             var z = Math.random() * 100 - 50
@@ -147,6 +141,10 @@ var Background = function (renderer, scene) {
         this.scene.fog = new THREE.Fog(skyColor, 0.01, this.fogDistance);
         
 
+    }
+
+    this.enable = () => {
+        this.enabled = true
     }
 
     initBackground(renderer, scene)

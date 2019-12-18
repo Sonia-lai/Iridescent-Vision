@@ -283,6 +283,7 @@ function testBackground() {
 
     if (!background) {
         background = new Background(renderer, scene);
+        background.enable()
     }
     else {
         background.disable()
