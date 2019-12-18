@@ -11,6 +11,17 @@ let SoundHandler = function(){
         Tone.Transport.schedule(f, String(min*60+sec));
     }
 
+    this.loadPlayer = (soundPlayer, fadeout = 0) => {
+        let playerList = [];
+        soundPlayer.forEach((e) => {
+            playerList.push(new Tone.Player({
+                "url": e,
+                "fadeOut": fadeout,
+            }).toMaster());
+        })
+        return playerList;
+    }
+
     function play() {
         Tone.Transport.start();
     }

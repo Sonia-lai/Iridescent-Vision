@@ -2,8 +2,10 @@ import * as THREE from 'three';
 import {Particle} from './Particle';
 import { Vector3, Mesh } from 'three/build/three.module';
 import * as dat from 'dat.gui';
+import pullSound from './sounds/mask_pull.mp3';
+import releaseSound from './sounds/mask_release.mp3';
 
-var SoftVolume = function(scene, mesh, isGltf) {
+var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
     
     //public variable
     this.scene = scene;
@@ -22,9 +24,12 @@ var SoftVolume = function(scene, mesh, isGltf) {
     this.pullTo = -2;
     this.constraintTime = 2;
     this.timeoutms = 3000;
-
+    this.soundHandler = soundHandler;
     
     //private variable
+    const PULL = 0;
+    const RELEASE = 1;
+
     var enabled = false;
     let timesq = this.timestep * this.timestep * 10;
     let particles = [];
@@ -43,6 +48,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
     let timeout = undefined;
 
     let oriMaterial;
+    let player;
 
     //public function
     this.update = (camera) => {
@@ -95,6 +101,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
             oriMaterial = undefined;
         }
         enabled = false;
+        this.backToOrigin();
     }
 
     this.dispose = () => {
@@ -105,6 +112,23 @@ var SoftVolume = function(scene, mesh, isGltf) {
         document.removeEventListener( 'mouseup', onMouseUp, false );
         document.removeEventListener( 'mousedown', onMouseDown, false );
         document.removeEventListener( 'mouseout', onMouseOut, false );
+    }
+
+    this.backToOrigin = () => {
+        for ( var i = 0, il = particles.length; i < il; i ++ ) {
+            this.mesh.geometry.attributes.position.array[ i*3 ] = particles[ i ].original.x;
+            this.mesh.geometry.attributes.position.array[ i*3+1 ] = particles[ i ].original.y;
+            this.mesh.geometry.attributes.position.array[ i*3+2 ] = particles[ i ].original.z;
+        }
+        
+        if (this.isGltf)
+            this.mesh.geometry.attributes.position.needsUpdate = true;
+        this.mesh.geometry.computeFaceNormals();
+        this.mesh.geometry.computeVertexNormals();
+
+        this.mesh.geometry.normalsNeedUpdate = true;
+        this.mesh.geometry.verticesNeedUpdate = true;
+
     }
 
     //private function
@@ -182,6 +206,10 @@ var SoftVolume = function(scene, mesh, isGltf) {
         }
     }
 
+    let initSound = () => {
+        player = soundHandler.loadPlayer([pullSound, releaseSound]);
+    }
+
     let changeTexture = () => {
         var textureLoader = new THREE.TextureLoader();
         var texture = textureLoader.load( "https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png" );
@@ -226,7 +254,6 @@ var SoftVolume = function(scene, mesh, isGltf) {
     
         this.mesh.geometry.normalsNeedUpdate = true;
         this.mesh.geometry.verticesNeedUpdate = true;
-
         //mesh.geometry.attributes.normal.needsUpdate = true;
     }
 
@@ -312,6 +339,9 @@ var SoftVolume = function(scene, mesh, isGltf) {
 
         if (psel == undefined && click && !mouse3d.equals( new THREE.Vector3(0,0,0)) ) {
             setFirstClick(true);
+            if (player[PULL].loaded)
+                player[PULL].start();
+            
             let dist = Infinity;
             mouse3d.sub(this.mesh.position);
             // find nearest particle
@@ -378,7 +408,12 @@ var SoftVolume = function(scene, mesh, isGltf) {
     let onMouseUp = function (e) { 
         
         if (e.button == 0) {
-            if (click && psel) waitForFinished();
+            if (click && psel) {
+                waitForFinished();
+                player[PULL].stop();
+                if (player[RELEASE].loaded)
+                    player[RELEASE].start();
+            }
             click = false;
             psel = undefined;
         }
@@ -386,14 +421,24 @@ var SoftVolume = function(scene, mesh, isGltf) {
 
     let onTouchEnd = function (e) {
         //alert('~end');
-        if (click && psel) waitForFinished();
+        if (click && psel) {
+            waitForFinished();
+            player[PULL].stop();
+            if (player[RELEASE].loaded)
+                player[RELEASE].start();
+        }
         click = false;
         psel = undefined;
     }
     
     let onMouseOut = function (e) { 
         if (e.button == 0) {
-            if (click && psel) waitForFinished();
+            if (click && psel) {
+                waitForFinished();
+                player[PULL].stop();
+                if (player[RELEASE].loaded)
+                    player[RELEASE].start();
+            }
             click = false;
             psel = undefined;
 
@@ -412,7 +457,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
     }
 
     // construct code here
-
+    initSound();
     if (this.mesh == null) initMesh();
     if (this.isGltf) init();
     else initGeo();

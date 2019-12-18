@@ -1,18 +1,19 @@
 import * as THREE from 'three';
-import { Vector3 } from 'three/build/three.module';
+
 
 var GlassSkin = function(scene, mesh) {
     
     this.scene = scene;
     this.mesh = mesh;
-    this.uuid = []
+    this.uuid = [];
+
     let cubeCamera;
     let enabled = false;
     let oriMaterial = mesh.material;
     let cubeMaterial;
+    
 
     let init = () => {
-
         for (var child of this.scene.children) {
             this.uuid.push(child.uuid)
         } 
@@ -27,6 +28,7 @@ var GlassSkin = function(scene, mesh) {
     
         this.mesh.material = cubeMaterial;
     }
+    
     
     this.update = (renderer, camera) => {
         if (!enabled) return;

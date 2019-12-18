@@ -1,9 +1,12 @@
-import { SceneUtils, MeshStandardMaterial } from 'three/build/three.module';
 import * as THREE from 'three';
 import * as OIMO from 'oimo';
 import {Vec3} from 'oimo/src/math/Vec3';
+import ballCollide from './sounds/ball_collide.mp3';
+import ballFly from './sounds/ball_fly.mp3';
+import ballRoll from './sounds/ball_roll.mp3';
 
-var Gravity = function (scene, mesh) {
+
+var Gravity = function (scene, mesh, soundHandler) {
     let geo = {
 
         plane     : new THREE.PlaneBufferGeometry(1, 1),
@@ -18,10 +21,18 @@ var Gravity = function (scene, mesh) {
 
     }
 
+    const COL = 0;
+    const FLY = 1;
+    const ROLL = 2;
 
     let world;
     let bodys = [];
+    let centerBody;
     let size = 200;
+    let player;
+    //let collidePlayer, flyPlayer;
+    //let playerLoad = 0;
+
     this.uuid = []
 
     this.applyN = true;
@@ -30,10 +41,42 @@ var Gravity = function (scene, mesh) {
     this.center = new THREE.Vector3(0, 0, 0);
     this.all = false
     this.mesh = mesh
+    this.soundReady;
+    this.soundHandler = soundHandler;
 
 
     let rand = (low, high) => low + Math.random() * (high - low);
     let randInt = (low, high) => low + Math.floor(Math.random() * (high - low + 1));
+    
+    let init = () => {
+        initSound();
+
+        //TODO: change to enable!
+        changeTexture();
+        for (var child of this.scene.children) {
+            this.uuid.push(child.uuid)
+        } 
+        world = initWorld()
+        centerBody = add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
+        for (var i = 0; i < size; i++) {
+            var b = add2World(createParticle(rand(0.5, 1)))
+        }
+        
+
+    };
+
+    // let checkLoadReady = () => {
+    //     playerLoad ++;
+    //     if (playerLoad == 2) {
+    //         console.log('gravity sound ready!');
+    //         if (this.soundReady) this.soundReady();
+    //     }
+    // }
+
+    let initSound = () => {
+        player = soundHandler.loadPlayer([ballCollide, ballFly, ballRoll]);
+    }
+    
     let initWorld = () => {
         return new OIMO.World({
                 timestep: 1 / 60,
@@ -83,7 +126,8 @@ var Gravity = function (scene, mesh) {
             color: 0xffe6e6,
             side: THREE.DoubleSide,
             alphaTest: 0.7,
-            shininess: 30 });
+            });
+
 
         if (!noMesh) {
             
@@ -109,7 +153,10 @@ var Gravity = function (scene, mesh) {
 
         bodys.forEach(function (b, id) {
             
+            //console.log(b.userData.contact);
+
             if (b.type === 1) {
+                contact(b);
                 m = b.mesh;
                 force = center.clone().sub(m.position).normalize().multiplyScalar(10);
                 if (applyN && (Math.floor(Math.random() * 4) || all)) {
@@ -127,19 +174,24 @@ var Gravity = function (scene, mesh) {
         if (this.all) this.all = false
     }
 
-    let init = () => {
-        changeTexture()
-        for (var child of this.scene.children) {
-            this.uuid.push(child.uuid)
-        } 
-        world = initWorld()
-        add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
-        for (var i = 0; i < size; i++) {
-            var b = add2World(createParticle(rand(0.5, 1)))
-        }
-        
+    let contact = (b) => {
 
-    };
+        var c = world.getContact( centerBody, b);
+        //if (!(b.userData)) b.userData = {contact: false};
+        if( c ){ 
+            //b.userData.contact = true;
+            if( !c.close ) {
+                if (player[COL].state == 'stopped' && player[COL].loaded)
+                    player[COL].start();
+            } else {
+                if (player[ROLL].state == 'stopped' && player[ROLL].loaded)
+                    player[ROLL].start();
+            }
+        } 
+    
+    }    
+
+    
     let changeTexture = () => {
         var textureLoader = new THREE.TextureLoader();
         var texture = textureLoader.load("https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png");
@@ -147,13 +199,13 @@ var Gravity = function (scene, mesh) {
         let MeshMaterial = new THREE.MeshStandardMaterial({
             color: 0xebaf09,
             emissive: 0xc325e,
-            specular: 0x441833,
             map: texture,
             side: THREE.DoubleSide,
             roughness: 0.32,
             metalness: 0.28
 
         });
+        //specular: 0x441833,
 
         this.mesh.material = MeshMaterial;
 
@@ -203,11 +255,15 @@ var Gravity = function (scene, mesh) {
     let applyForce = () => {
         this.applyN = true
         this.all    = false 
+        if (player[FLY].loaded)
+            player[FLY].start();
     }
     
     let applyAllForce = () => {
         this.applyN = true
         this.all    = true 
+        if (player[FLY].loaded)
+            player[FLY].start();
     }
 
     document.addEventListener('click'   , applyForce, false);
