@@ -34,7 +34,6 @@ var soundHandler;
 
 
 
-
 init();
 animate();
 
@@ -51,7 +50,7 @@ function initSound() {
     soundHandler.schedule(() => {
         console.log('change to gravity');
         if (softVolume) softVolume.disable();
-        gravity = new Gravity(scene, mesh)
+        gravity = new Gravity(scene, mesh, soundHandler);
         gravity.enable()
         background.direction = 'up'
         // background.speed     = 0.3
@@ -215,7 +214,7 @@ function testEvent() {
             if (glassSkin) glassSkin.disable();
             if (softVolume) softVolume.disable();
             if (!gravity) {
-                gravity = new Gravity(scene, mesh)
+                gravity = new Gravity(scene, mesh, soundHandler);
                 gravity.enable()
             } else {
                 gravity.disable()
@@ -312,7 +311,7 @@ function testTransparent() {
     directionalLight.intensity = 1;
 
     if (!mouseLight)
-        mouseLight = new MouseLight(scene, camera);
+        mouseLight = new MouseLight(scene, camera, soundHandler);
     mouseLight.enable();
 
     if (!glassSkin)
@@ -330,7 +329,7 @@ function testSoft() {
     controls.enabled = false;
     directionalLight.intensity = 0.5;
     if (!softVolume) {
-        softVolume = new SoftVolume(scene, mesh, true);
+        softVolume = new SoftVolume(scene, mesh, true, soundHandler);
         let gui = new dat.GUI();
         softVolume.setGUI(gui);
     }

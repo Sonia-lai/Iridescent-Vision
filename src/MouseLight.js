@@ -1,7 +1,11 @@
 import * as THREE from 'three';
 import { Vector3 } from 'three/build/three.module';
+import light1 from './sounds/light1.mp3';
+import light2 from './sounds/light2.mp3';
+import light3 from './sounds/light3.mp3';
 
-var MouseLight = function (scene, camera) {
+
+var MouseLight = function (scene, camera, soundHandler) {
 
     this.scene = scene;
     this.camera = camera;
@@ -12,11 +16,17 @@ var MouseLight = function (scene, camera) {
     this.intensityStep = 0.02;
     this.angleStep = 0.005;
 
+    this.soundHandler = soundHandler;
+
     let light, target;
     let raycaster = new THREE.Raycaster();
     let mouse = {x:0, y:0}
     let count = 0;
     let enabled = false;
+    let player;
+    let playerOrder = 0;
+    let mouseMove = false;
+    let prevMouseMove = false;
 
     let initLight = () => {
         light = new THREE.SpotLight( 0xffffff, this.initIntensity);
@@ -29,13 +39,26 @@ var MouseLight = function (scene, camera) {
         this.scene.add(target);
         light.target = target; 
     }
+
+    let initSound = () => {
+        player = soundHandler.loadPlayer([light1, light2, light3], 1);
+    }
     
     // Follows the mouse event
     let onMouseMove = (event) => {
+        mouseMove = true;
       // Update the mouse variable
       event.preventDefault();
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    let onMouseOut = (event) => {
+        // if (player) {
+        //     if (player[0].state == 'stopped' && player[1].state == 'stopped' && player[2].state == 'stopped') {
+        //         player[Math.floor(Math.random()*3)].start();
+        //     }
+        // }
     }
 
     let onTouchMove = (event) => {
@@ -47,11 +70,18 @@ var MouseLight = function (scene, camera) {
     
     this.update = (mesh) => {
         if (!enabled) return;
-
+        
         light.position.copy(this.camera.position);
 
         if (!raycaster || !light || !mesh) return;
-
+        if (!mouseMove && player) {
+            if (player[playerOrder].state !== 'stopped') {
+                player[playerOrder].stop();
+                playerOrder = (playerOrder+1)%3;
+            }
+            return;
+        }
+        
         raycaster.setFromCamera( mouse, this.camera );
         var intersects = raycaster.intersectObjects([mesh], true );
     
@@ -62,9 +92,19 @@ var MouseLight = function (scene, camera) {
                 light.angle += this.angleStep; 
             }
             target.position.copy(intersects[0].point);
+            if (player) {
+                if (player[playerOrder].loaded)
+                    player[playerOrder].start();
+            }    
         } else {
+            if (player[playerOrder].state !== 'stopped') {
+                player[playerOrder].stop();
+                playerOrder = (playerOrder+1)%3;
+            }
             target.position.copy(new Vector3(-100,-100,-100));
-        }
+        } 
+        mouseMove = false;
+        
     }
 
     this.enable = () => {
@@ -89,7 +129,12 @@ var MouseLight = function (scene, camera) {
     //TODO: prevent scroll
     document.addEventListener( 'touchmove', onTouchMove, false );
     document.addEventListener('mousemove', onMouseMove, false);
+    document.addEventListener( 'mouseup', onMouseOut, false );
+    document.addEventListener( 'mouseout', onMouseOut, false );
+    initSound();
     initLight();
+
+    
 }
 
 export {MouseLight};
