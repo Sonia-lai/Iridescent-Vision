@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import {Particle} from './Particle';
 import { Vector3, Mesh } from 'three/build/three.module';
+import pattern from './images/circuit_pattern.png'
 import * as dat from 'dat.gui';
 
 var SoftVolume = function(scene, mesh, isGltf) {
@@ -184,7 +185,7 @@ var SoftVolume = function(scene, mesh, isGltf) {
 
     let changeTexture = () => {
         var textureLoader = new THREE.TextureLoader();
-        var texture = textureLoader.load( "https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png" );
+        var texture = textureLoader.load(pattern);
 
         let MeshMaterial = new THREE.MeshPhongMaterial( {
             color: 0x624eba,

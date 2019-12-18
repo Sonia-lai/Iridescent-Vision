@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import * as OIMO from 'oimo';
 import {Vec3} from 'oimo/src/math/Vec3';
-import pattern from './images/circuit_pattern.png'
 
 var Gravity = function (scene, mesh) {
     let geo = {
@@ -139,12 +138,13 @@ var Gravity = function (scene, mesh) {
 
         document.addEventListener('click', applyForce, false)
         document.addEventListener('dblclick', applyAllForce, false)
+
         
 
     };
     let changeTexture = () => {
         var textureLoader = new THREE.TextureLoader();
-        var texture = textureLoader.load(pattern);
+        var texture = textureLoader.load("https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png");
 
         let MeshMaterial = new THREE.MeshStandardMaterial({
             color: 0xebaf09,
