@@ -60,6 +60,9 @@ var Gravity = function (scene, mesh, soundHandler) {
         for (var i = 0; i < size; i++) {
             var b = add2World(createParticle(rand(0.5, 1)))
         }
+
+        document.addEventListener('click', applyForce, false)
+        document.addEventListener('dblclick', applyAllForce, false)
         
 
     };
