@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as OIMO from 'oimo';
 import {Vec3} from 'oimo/src/math/Vec3';
+import pattern from './images/circuit_pattern.png'
 
 var Gravity = function (scene, mesh) {
     let geo = {
@@ -133,14 +134,17 @@ var Gravity = function (scene, mesh) {
         world = initWorld()
         add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
         for (var i = 0; i < size; i++) {
-            var b = add2World(createParticle(rand(0.5, 1)))
+            add2World(createParticle(rand(0.5, 1)))
         }
+
+        document.addEventListener('click', applyForce, false)
+        document.addEventListener('dblclick', applyAllForce, false)
         
 
     };
     let changeTexture = () => {
         var textureLoader = new THREE.TextureLoader();
-        var texture = textureLoader.load("https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png");
+        var texture = textureLoader.load(pattern);
 
         let MeshMaterial = new THREE.MeshStandardMaterial({
             color: 0xebaf09,
