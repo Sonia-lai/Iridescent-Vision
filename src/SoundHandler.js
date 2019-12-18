@@ -7,26 +7,31 @@ let SoundHandler = function(onProgress){
     //var players = [];
     var player = new Tone.Player(bgm, function(){
         // console.log('bgm ready!');
-        player.sync().start(0);
+        //player.sync().start(0);
         loaded += 1;
         onProgress(loaded);
     }).toMaster();
     //players.push(player);
-    
+    this.playBG = () => {
+        console.log('playBG');
+        player.start();
+    }
+
     this.schedule = (f, min, sec) => {
         Tone.Transport.schedule(f, String(min*60+sec));
     }
 
     this.loadPlayer = (soundPlayer, fadeout = 0) => {
+        console.log('loadPlayer:', soundPlayer.length);
         let playerList = [];
         soundPlayer.forEach((e) => {
-            playerList.push(new Tone.Player({
-                "url": e,
-                "fadeOut": fadeout,
-            }).toMaster());
-        }, function(){
-            loaded += 1;
-            onProgress(loaded);
+            let p = new Tone.Player(e, () => {
+                loaded += 1;
+                this.onProgress(loaded);
+            }).toMaster();
+            p.fadeout = fadeout;
+            playerList.push(p);
+            
         })
         //players.concat(playerList);
         return playerList;

@@ -98,13 +98,14 @@ var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
     }
 
     this.disable = () => {
+        this.backToOrigin();
         if (oriMaterial) {
             this.mesh.material = oriMaterial;
             oriMaterial = undefined;
         }
         enabled = false;
         removeListener();
-        this.backToOrigin();
+        
     }
 
     this.dispose = () => {
@@ -117,6 +118,8 @@ var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
     }
 
     this.backToOrigin = () => {
+        if (!this.mesh.geometry) return;
+
         for ( var i = 0, il = particles.length; i < il; i ++ ) {
             this.mesh.geometry.attributes.position.array[ i*3 ] = particles[ i ].original.x;
             this.mesh.geometry.attributes.position.array[ i*3+1 ] = particles[ i ].original.y;

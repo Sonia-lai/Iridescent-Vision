@@ -73,7 +73,7 @@ var MouseLight = function (scene, camera, soundHandler) {
             }
             return;
         }
-        
+        //console.log(mesh);
         raycaster.setFromCamera( mouse, this.camera );
         var intersects = raycaster.intersectObjects([mesh], true );
     

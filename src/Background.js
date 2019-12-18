@@ -37,8 +37,8 @@ var Background = function (renderer, scene) {
     this.disable = () => {
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
-            if (!this.uuid.includes(obj.uuid)) {
-                doDispose(obj, this.scene)
+            if (this.uuid.includes(obj.uuid)) {
+                clearObject(obj, this.scene)
             }
 
         }
@@ -50,7 +50,7 @@ var Background = function (renderer, scene) {
         scene.remove(obj);
         if (obj !== null) {
             for (var i = 0; i < obj.children.length; i++) {
-                doDispose(obj.children[i]);
+                doDispose(obj.children[i], scene);
             }
             if (obj.geometry) {
                 obj.geometry.dispose();
@@ -105,11 +105,12 @@ var Background = function (renderer, scene) {
         ambientLight = new THREE.AmbientLight(lightColor);
         
         this.scene.add(ambientLight);
-
+        this.uuid.push(ambientLight.uuid)
         hemiLight = new THREE.HemisphereLight(lightColor, 0xffffff, brightness);
         hemiLight.position.set(0, 8, 0);
         hemiLight.name = 'hemiLight'
         this.scene.add(hemiLight);
+        this.uuid.push(hemiLight.uuid)
 
     }   
  
@@ -121,6 +122,7 @@ var Background = function (renderer, scene) {
             for(var i =0;i < bldgs.length;i++) {
                 bldgs[i].mesh.name = 'bldgs'
                 this.scene.add(bldgs[i].mesh)
+                this.uuid.push( bldgs[i].mesh.uuid)
             }
             
         }
@@ -152,9 +154,9 @@ var Background = function (renderer, scene) {
 
     let initBackground = (renderer) => {
 
-        for (var child of this.scene.children) {
-            this.uuid.push(child.uuid)
-        } 
+        // for (var child of this.scene.children) {
+        //     this.uuid.push(child.uuid)
+        // } 
 
         renderer.setClearColor(new THREE.Color(skyColor));
         renderer.shadowMap.enabled = true;

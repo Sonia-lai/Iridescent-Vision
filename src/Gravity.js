@@ -39,12 +39,10 @@ var Gravity = function (scene, mesh, soundHandler) {
 
         world = initWorld()
         centerBody = add2World({ type: 'sphere', geometry: new THREE.SphereBufferGeometry(1, 32, 24), size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
-        for (var i = 0; i < size; i++) {
-            var b = add2World(createParticle(rand(0.5, 1)))
-        }
-
-        document.addEventListener('click', applyForce, false)
-        document.addEventListener('dblclick', applyAllForce, false)
+        // for (var i = 0; i < size; i++) {
+        //     var b = add2World(createParticle(rand(0.5, 1)))
+        // }
+        
         
         //console.log('init!!!');
     };
@@ -115,10 +113,10 @@ var Gravity = function (scene, mesh, soundHandler) {
         if (!noMesh) {
             let meshtemp = new THREE.Mesh(s, MeshMaterial);
             this.scene.add(meshtemp);
+            this.uuid.push(meshtemp.uuid);
             meshtemp.position.set(b.pos[0], b.pos[1], b.pos[2]);
             s.scale(o.size[0], o.size[1], o.size[2]);
             if (world) b.connectMesh(meshtemp);
-            ballMeshes.push(meshtemp);
         }
 
         if (world) return b;
@@ -136,7 +134,6 @@ var Gravity = function (scene, mesh, soundHandler) {
         bodys.forEach(function (b, id) {
             
             //console.log(b.userData.contact);
-
             if (b.type === 1) {
                 contact(b);
                 m = b.mesh;
@@ -203,9 +200,9 @@ var Gravity = function (scene, mesh, soundHandler) {
         }
 
         changeTexture();
-        for (var child of this.scene.children) {
-            this.uuid.push(child.uuid)
-        }
+        // for (var child of this.scene.children) {
+        //     this.uuid.push(child.uuid)
+        // }
 
         world.play();
     }
@@ -221,8 +218,8 @@ var Gravity = function (scene, mesh, soundHandler) {
         oriMaterial = undefined
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
-            if (!this.uuid.includes(obj.uuid)) {
-                doDispose(obj, this.scene)
+            if (this.uuid.includes(obj.uuid)) {
+                clearObject(obj, this.scene)
             }
 
         }

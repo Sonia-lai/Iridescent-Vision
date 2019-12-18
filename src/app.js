@@ -35,21 +35,22 @@ var textLayer;
 var manager = new THREE.LoadingManager();
 var managerLoad = 0;
 var soundLoad = 0;
-var totalLoad = 15;
+var totalLoad = 16;
 
 init();
 animate();
 
 function initSound() {
     soundHandler = new SoundHandler(soundOnProgress);
-    
+    //return;
     //call soundHandler.play() when click?
     soundHandler.schedule(() => {
-        console.log('start');
+        //console.log('start');
+        soundHandler.playBG();
         softVolume.enable();
-        controls.enable = false;
+        background.enable();
     }, 0, 0);
-
+    
     soundHandler.schedule(() => {
         console.log('change to gravity');
         if (softVolume) {
@@ -57,7 +58,7 @@ function initSound() {
             softVolume.dispose();
             softVolume = undefined;
         }
-        gravity = new Gravity(scene, mesh, soundHandler);
+        //gravity = new Gravity(scene, mesh, soundHandler);
         gravity.enable()
         background.direction = 'up'
         // background.speed     = 0.3
@@ -83,10 +84,8 @@ function init() {
     let width = window.innerWidth
     let height = window.innerHeight
     intDocument();
-    initSound();
-    handleManager();
-
-    textLayer = new TextLayer(()=>{softVolume.enable();});
+    
+    
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
@@ -96,10 +95,18 @@ function init() {
     renderer.setClearColor('#FFFFFF');
 
     controls = new OrbitControls(camera, renderer.domElement)
-    
+    controls.enable = false;
+    //testBackground();
+    background = new Background(renderer, scene);
+
+    initSound();
+    textLayer = new TextLayer(()=>{soundHandler.start();});
+
+    handleManager();
     initLight();
-    testBackground();
+    
     initModel();
+    
 
     document.body.appendChild(renderer.domElement);
     testEvent();
@@ -116,7 +123,7 @@ function intDocument () {
 
 
 function initLight() {
-    directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
     directionalLight.position.set(-1, -0.4, 1);
     scene.add(directionalLight);
     scene.add(new THREE.DirectionalLight(0xffffff, 0.5));
@@ -137,8 +144,8 @@ function initModel() {
                 mesh = child;
                 mesh.name = 'mask'
                 scene.add(mesh);
+                console.log(mesh);
                 initMode();
-
             }
         })
     });
@@ -155,9 +162,9 @@ function initModel() {
 }
 
 function initMode() {
-    softVolume = new SoftVolume(scene, mesh, true, soundHandler);
-    gravity = new Gravity(scene, mesh, soundHandler);
     mouseLight = new MouseLight(scene, camera, soundHandler);
+    gravity = new Gravity(scene, mesh, soundHandler);
+    softVolume = new SoftVolume(scene, mesh, true, soundHandler);
     //softVolume.enable();
     //gravity.enable();
 }
@@ -190,7 +197,7 @@ function animateValue(start, end, duration) {
     loadingAnimateTimer = setInterval(function() {
         current += increment;
         current = Math.min(current, end);
-        textLayer.changeText(current+'%');
+        textLayer.changeText(current.toFixed(0)+'%');
         if (current == end) {
             loadFinish();
             clearInterval(loadingAnimateTimer);
@@ -199,13 +206,14 @@ function animateValue(start, end, duration) {
 }
 
 function loadFinish() {
+    if (soundLoad + managerLoad !== totalLoad) return;
     console.log('load finish!');
     textLayer.addButton('CLICK TO START');
 }
 
 function handleLoading() {
     let load = 100*(soundLoad+managerLoad)/totalLoad;
-    //console.log('load:', load);
+    console.log('load:', soundLoad, managerLoad);
     clearInterval(loadingAnimateTimer);
     animateValue(parseInt(textLayer.nowInnerHtml().slice(0,-1)), load, 800);
 }
@@ -233,16 +241,20 @@ function testEvent() {
     window.addEventListener('keydown', function (e) {
         var keyID = e.code;
         if (keyID === 'KeyA') {
+            console.log('now mesh:', mesh);
             if (background) {
                 background.disable()
                 background = null
             }
-
+            console.log('after disable bg mesh:', mesh);
             if (softVolume) softVolume.disable();
+            console.log('after disable soft mesh:', mesh);
             if (gravity) {
                 gravity.disable()
                 gravity = null
             }
+            console.log('after disable gravity mesh:', mesh);
+            
             testTransparent();
             e.preventDefault();
         }
@@ -374,9 +386,10 @@ function testTransparent() {
         background.disable()
         background = undefined
     }
-    if (softVolume) softVolume.disable();
-    directionalLight.intensity = 1;
+    // if (softVolume) softVolume.disable();
+    //directionalLight.intensity = 1;
 
+    //console.log(mesh, face);
     if (!mouseLight)
         mouseLight = new MouseLight(scene, camera, soundHandler);
     mouseLight.enable();
