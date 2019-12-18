@@ -92,6 +92,7 @@ var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
 
     this.enable = () => {
         changeTexture();
+        addListener();
         enabled = true;
     }
 
@@ -101,17 +102,17 @@ var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
             oriMaterial = undefined;
         }
         enabled = false;
+        removeListener();
         this.backToOrigin();
     }
 
     this.dispose = () => {
+        particles = [];
+        constraints = [];
         //TODO: remove dat.gui
         //gui.destroy();
-        this.gui.removeFolder('soft volume');
-        document.removeEventListener( 'mousemove', onMouseMove, false );
-        document.removeEventListener( 'mouseup', onMouseUp, false );
-        document.removeEventListener( 'mousedown', onMouseDown, false );
-        document.removeEventListener( 'mouseout', onMouseOut, false );
+        //this.gui.removeFolder('soft volume');
+        removeListener();
     }
 
     this.backToOrigin = () => {
@@ -456,19 +457,33 @@ var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
         firstClick = bool;
     }
 
+    let addListener = () => {
+        document.addEventListener( 'mousemove', onMouseMove, false );
+        document.addEventListener( 'mouseup', onMouseUp, false );
+        document.addEventListener( 'mousedown', onMouseDown, false );
+        document.addEventListener( 'mouseout', onMouseOut, false );
+        document.addEventListener( 'touchstart', onTouchStart, false );
+        document.addEventListener( 'touchend', onTouchEnd, false );
+        document.addEventListener( 'touchmove', onTouchMove, false );
+    }
+
+    let removeListener = () => {
+        document.removeEventListener( 'mousemove', onMouseMove, false );
+        document.removeEventListener( 'mouseup', onMouseUp, false );
+        document.removeEventListener( 'mousedown', onMouseDown, false );
+        document.removeEventListener( 'mouseout', onMouseOut, false );
+        document.removeEventListener( 'touchstart', onTouchStart, false );
+        document.removeEventListener( 'touchend', onTouchEnd, false );
+        document.removeEventListener( 'touchmove', onTouchMove, false );
+    }
+
     // construct code here
     initSound();
     if (this.mesh == null) initMesh();
     if (this.isGltf) init();
     else initGeo();
     //changeTexture();
-    document.addEventListener( 'mousemove', onMouseMove, false );
-    document.addEventListener( 'mouseup', onMouseUp, false );
-    document.addEventListener( 'mousedown', onMouseDown, false );
-    document.addEventListener( 'mouseout', onMouseOut, false );
-    document.addEventListener( 'touchstart', onTouchStart, false );
-	document.addEventListener( 'touchend', onTouchEnd, false );
-    document.addEventListener( 'touchmove', onTouchMove, false );
+    //addListener();
 
 }
 

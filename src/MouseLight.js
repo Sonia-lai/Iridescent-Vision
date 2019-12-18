@@ -26,7 +26,6 @@ var MouseLight = function (scene, camera, soundHandler) {
     let player;
     let playerOrder = 0;
     let mouseMove = false;
-    let prevMouseMove = false;
 
     let initLight = () => {
         light = new THREE.SpotLight( 0xffffff, this.initIntensity);
@@ -53,13 +52,6 @@ var MouseLight = function (scene, camera, soundHandler) {
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     }
 
-    let onMouseOut = (event) => {
-        // if (player) {
-        //     if (player[0].state == 'stopped' && player[1].state == 'stopped' && player[2].state == 'stopped') {
-        //         player[Math.floor(Math.random()*3)].start();
-        //     }
-        // }
-    }
 
     let onTouchMove = (event) => {
         event.preventDefault();
@@ -109,7 +101,8 @@ var MouseLight = function (scene, camera, soundHandler) {
 
     this.enable = () => {
         enabled = true;
-        light.initIntensity = this.initIntensity;
+        initLight();
+        //light.initIntensity = this.initIntensity;
     }
 
     this.disable = () => {
@@ -129,11 +122,9 @@ var MouseLight = function (scene, camera, soundHandler) {
     //TODO: prevent scroll
     document.addEventListener( 'touchmove', onTouchMove, false );
     document.addEventListener('mousemove', onMouseMove, false);
-    document.addEventListener( 'mouseup', onMouseOut, false );
-    document.addEventListener( 'mouseout', onMouseOut, false );
-    initSound();
-    initLight();
 
+    initSound();
+    //initLight();
     
 }
 

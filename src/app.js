@@ -37,7 +37,7 @@ var textLayer;
 var manager = new THREE.LoadingManager();
 var managerLoad = 0;
 var soundLoad = 0;
-var totalLoad = 8;
+var totalLoad = 15;
 
 init();
 animate();
@@ -48,14 +48,18 @@ function initSound() {
     //call soundHandler.play() when click?
     soundHandler.schedule(() => {
         console.log('start');
-        testSoft();
-        testBackground();
+        //testSoft();
+        softVolume.enable();
         controls.enable = false;
     }, 0, 0);
 
     soundHandler.schedule(() => {
         console.log('change to gravity');
-        if (softVolume) softVolume.disable();
+        if (softVolume) {
+            softVolume.disable();
+            softVolume.dispose();
+            softVolume = undefined;
+        }
         gravity = new Gravity(scene, mesh, soundHandler);
         gravity.enable()
         background.direction = 'up'
@@ -80,8 +84,8 @@ function initSound() {
 function init() {
     handleManager();
     initSound();
-    textLayer = new TextLayer(soundHandler.start);
-
+    //textLayer = new TextLayer(soundHandler.start);
+    textLayer = new TextLayer(()=>{softVolume.enable();});
     let width = window.innerWidth
     let height = window.innerHeight
 
@@ -94,11 +98,10 @@ function init() {
     renderer.setClearColor('#FFFFFF');
 
     controls = new OrbitControls(camera, renderer.domElement)
-
-    initLight()
-    initModel()
-
-
+    
+    initLight();
+    testBackground();
+    initModel();
 
     document.body.appendChild(renderer.domElement);
     testEvent();
@@ -131,6 +134,8 @@ function initModel() {
                 mesh = child;
                 mesh.name = 'mask'
                 scene.add(mesh);
+                initMode();
+
             }
         })
     });
@@ -144,7 +149,14 @@ function initModel() {
         scene.add(face);
     });
 
+}
 
+function initMode() {
+    softVolume = new SoftVolume(scene, mesh, true, soundHandler);
+    gravity = new Gravity(scene, mesh, soundHandler);
+    mouseLight = new MouseLight(scene, camera, soundHandler);
+    //softVolume.enable();
+    //gravity.enable();
 }
 
 
@@ -376,10 +388,7 @@ function testTransparent() {
     //glassSkin.addTestBackground();
     renderer.setClearColor('#457552');  
     directionalLight.intensity = 0.8;
-
     glassSkin.enable();
-
-
 }
 
 function testSoft() {
@@ -412,9 +421,3 @@ window.onresize = function () {
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
 }
-
-
-
-
-
-

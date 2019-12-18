@@ -7,19 +7,6 @@ import ballRoll from './sounds/ball_roll.mp3';
 
 
 var Gravity = function (scene, mesh, soundHandler) {
-    let geo = {
-
-        plane     : new THREE.PlaneBufferGeometry(1, 1),
-        box       : new THREE.BoxBufferGeometry(1, 1, 1),
-        hardbox   : new THREE.BoxBufferGeometry(1, 1, 1),
-        cone      : new THREE.CylinderBufferGeometry(0, 1, 0.5),
-        wheel     : new THREE.CylinderBufferGeometry(1, 1, 1, 18),
-        sphere    : new THREE.SphereBufferGeometry(1, 24, 18),
-        highsphere: new THREE.SphereBufferGeometry(1, 32, 24),
-        cylinder  : new THREE.CylinderBufferGeometry(1, 1, 1, 12, 1),
-        mouse     : new THREE.CylinderBufferGeometry(0.25, 0, 0.5),
-
-    }
 
     const COL = 0;
     const FLY = 1;
@@ -30,6 +17,7 @@ var Gravity = function (scene, mesh, soundHandler) {
     let centerBody;
     let size = 200;
     let player;
+    let ballMeshes = [];
     //let collidePlayer, flyPlayer;
     //let playerLoad = 0;
 
@@ -51,18 +39,10 @@ var Gravity = function (scene, mesh, soundHandler) {
     let init = () => {
         initSound();
 
-        //TODO: change to enable!
-        changeTexture();
-        for (var child of this.scene.children) {
-            this.uuid.push(child.uuid)
-        } 
         world = initWorld()
-        centerBody = add2World({ type: 'sphere', geometry: geo.highsphere, size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
-        for (var i = 0; i < size; i++) {
-            var b = add2World(createParticle(rand(0.5, 1)))
-        }
+        centerBody = add2World({ type: 'sphere', geometry: new THREE.SphereBufferGeometry(1, 32, 24), size: [10, 30, 8], pos: [0, 0, 0], density: 1 }, true);
         
-
+        //console.log('init!!!');
     };
 
     // let checkLoadReady = () => {
@@ -112,7 +92,7 @@ var Gravity = function (scene, mesh, soundHandler) {
 
         if (world) {
             var b = world.add(o);
-            bodys.push(b);
+            //bodys.push(b);
         }
 
         let s;
@@ -126,16 +106,15 @@ var Gravity = function (scene, mesh, soundHandler) {
             color: 0xffe6e6,
             side: THREE.DoubleSide,
             alphaTest: 0.7,
-            });
-
+        });
 
         if (!noMesh) {
-            
             let meshtemp = new THREE.Mesh(s, MeshMaterial);
             this.scene.add(meshtemp);
             meshtemp.position.set(b.pos[0], b.pos[1], b.pos[2]);
             s.scale(o.size[0], o.size[1], o.size[2]);
             if (world) b.connectMesh(meshtemp);
+            ballMeshes.push(meshtemp);
         }
 
         if (world) return b;
@@ -213,14 +192,26 @@ var Gravity = function (scene, mesh, soundHandler) {
 
 
     this.enable = () => {
-        this.enabled = true
-        world.play()
+        this.enabled = true;
+        addListener();
+        //TODO: change to enable!
+        for (var i = 0; i < size; i++) {
+            bodys.push(add2World(createParticle(rand(0.5, 1))));
+        }
+
+        changeTexture();
+        for (var child of this.scene.children) {
+            this.uuid.push(child.uuid)
+        }
+
+        world.play();
     }
 
 
     this.disable = () => {
-        this.enabled = false
-        world.stop()
+        this.enabled = false;
+        removeListener();
+        world.stop();
 
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
@@ -248,10 +239,9 @@ var Gravity = function (scene, mesh, soundHandler) {
     }
 
     this.update = (pos) => {
-        if (!enable) return;
+        if (!this.enabled) return;
         postLoop(pos)
     }
-
 
     let applyForce = () => {
         this.applyN = true
@@ -267,8 +257,15 @@ var Gravity = function (scene, mesh, soundHandler) {
             player[FLY].start();
     }
 
-    document.addEventListener('click'   , applyForce, false);
-    document.addEventListener('dblclick', applyAllForce, false)
+    let addListener = () => {
+        document.addEventListener('click'   , applyForce, false);
+        document.addEventListener('dblclick', applyAllForce, false)
+    }    
+
+    let removeListener = () => {
+        document.removeEventListener('click'   , applyForce, false);
+        document.removeEventListener('dblclick', applyAllForce, false)
+    }
 
     init()
 }

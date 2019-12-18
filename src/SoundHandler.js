@@ -46,7 +46,7 @@ let SoundHandler = function(onProgress){
         Tone.Transport.start();
     }
 
-    window.addEventListener('keydown', function(e){  
+    window.addEventListener('keydown', (e) => {  
         if(e.code === 'KeyP')  {
             e.preventDefault();
             this.start();
