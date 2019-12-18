@@ -12,6 +12,7 @@ import {Activity} from './Activity'
 import * as dat from 'dat.gui';
 import { Gravity } from './Gravity'
 import { SoundHandler } from './SoundHandler';
+import {TextLayer} from './TextLayer';
 
 // import bgImage from './images/poster.jpg'
 // import linkImage from './images/sonia.jpg'
@@ -29,16 +30,21 @@ var directionalLight;
 // var raycaster = new THREE.Raycaster(), INTERSECTED;
 // var mouse = new THREE.Vector2();
 // var eventType, sphere;
-
+var loadingAnimateTimer;
 var soundHandler;
+var textLayer;
 
-
+var manager = new THREE.LoadingManager();
+var managerLoad = 0;
+var soundLoad = 0;
+var totalLoad = 8;
 
 init();
 animate();
 
 function initSound() {
-    soundHandler = new SoundHandler();
+    soundHandler = new SoundHandler(soundOnProgress);
+    
     //call soundHandler.play() when click?
     soundHandler.schedule(() => {
         console.log('start');
@@ -72,7 +78,9 @@ function initSound() {
 }
 
 function init() {
+    handleManager();
     initSound();
+    textLayer = new TextLayer(soundHandler.start);
 
     let width = window.innerWidth
     let height = window.innerHeight
@@ -96,7 +104,6 @@ function init() {
     testEvent();
 
 
-
 }
 
 
@@ -111,7 +118,7 @@ function initLight() {
 
 
 function initModel() {
-    let loader = new GLTFLoader();
+    let loader = new GLTFLoader(manager);
 
     loader.load(maskPath, gltf => {
         let model = gltf.scene
@@ -152,8 +159,58 @@ function animate() {
     if (activity) activity.update(camera)
 
     renderer.render(scene, camera);
+    //handleLoading();
+
+}
 
 
+function animateValue(start, end, duration) {
+    var range = end - start;
+    if (range == 0) return;
+    var increment = 2;
+    var current = start+increment;
+    current = Math.min(current, end);
+    textLayer.changeText(current+'%');
+    var stepTime = Math.abs(Math.floor(duration / range));
+    loadingAnimateTimer = setInterval(function() {
+        current += increment;
+        current = Math.min(current, end);
+        textLayer.changeText(current+'%');
+        if (current == end) {
+            loadFinish();
+            clearInterval(loadingAnimateTimer);
+        }
+    }, stepTime);
+}
+
+function loadFinish() {
+    console.log('load finish!');
+    textLayer.addButton('CLICK TO START');
+}
+
+function handleLoading() {
+    let load = 100*(soundLoad+managerLoad)/totalLoad;
+    //console.log('load:', load);
+    clearInterval(loadingAnimateTimer);
+    animateValue(parseInt(textLayer.nowInnerHtml().slice(0,-1)), load, 800);
+}
+
+function soundOnProgress(l) {
+    soundLoad = l;
+    handleLoading();
+}
+
+function handleManager() {
+
+    manager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+        managerLoad = itemsLoaded;
+        handleLoading();
+        //console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+    };
+    
+    manager.onError = function ( url ) {
+        console.log( 'There was an error loading ' + url );
+    };
 }
 
 
@@ -316,7 +373,7 @@ function testTransparent() {
 
     if (!glassSkin)
         glassSkin = new GlassSkin(scene, mesh);
-
+    //glassSkin.addTestBackground();
     renderer.setClearColor('#457552');  
     directionalLight.intensity = 0.8;
 

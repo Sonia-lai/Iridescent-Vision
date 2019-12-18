@@ -248,6 +248,7 @@ var Gravity = function (scene, mesh, soundHandler) {
     }
 
     this.update = (pos) => {
+        if (!enable) return;
         postLoop(pos)
     }
 

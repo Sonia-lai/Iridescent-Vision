@@ -50,7 +50,7 @@ var GlassSkin = function(scene, mesh) {
         var urls = [];
         for (var i=0; i<6; i++) urls.push("");
     
-        var context = require.context('./textures/Park3Med/', true, /\.(jpg)$/);
+        var context = require.context('./textures/Color/', true, /\.(jpg)$/);
         context.keys().forEach((filename)=>{
             let idx = url_temp.indexOf(filename);
             if (idx !== -1) {
