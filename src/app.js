@@ -58,7 +58,8 @@ function initSound() {
             count += 1
             if (count > 10) { clearInterval(interval) }
         }, 100);
-    }, 0, 32.5);
+    //}, 0, 32.5);
+    }, 0, 29);
 
     soundHandler.schedule(() => {
         // console.log('change to gravity');
@@ -72,7 +73,8 @@ function initSound() {
         gravity.enable()
         background.direction = 'up'
         
-    }, 0, 33);
+    //}, 0, 33);
+    }, 0, 29.5);
 
     soundHandler.schedule(() => {
         var count = 0
@@ -81,14 +83,15 @@ function initSound() {
             count += 1
             if (count > 10) {clearInterval(interval)}
         }, 100);
-    }, 0, 48.5)
-
+    //}, 0, 48.5)
+    }, 0, 40);
 
     soundHandler.schedule(() => {
         if (background) {
             background.speedup = true
         }
-    }, 1, 6)
+    //}, 1, 6)
+    }, 1, 3);
 
     soundHandler.schedule(() => {
         // console.log('change to transparent');
@@ -98,7 +101,8 @@ function initSound() {
         testTransparent();
         headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
         headmove.enable(camera, face, mesh)
-    }, 1, 10);
+    //}, 1, 10);
+    }, 1, 7);
 
     soundHandler.schedule(() => {
         if (mouseLight) mouseLight.disable();
