@@ -52,32 +52,87 @@ function initSound() {
     }, 0, 0);
     
     soundHandler.schedule(() => {
-        console.log('change to gravity');
+        var count = 0
+        var interval = setInterval(() => {
+            flash()
+            count += 1
+            if (count > 10) { clearInterval(interval) }
+        }, 100);
+    }, 0, 32.5);
+
+    soundHandler.schedule(() => {
+        // console.log('change to gravity');
+            
         if (softVolume) {
             softVolume.disable();
             softVolume.dispose();
             softVolume = undefined;
         }
-        //gravity = new Gravity(scene, mesh, soundHandler);
+        gravity = new Gravity(scene, mesh, soundHandler);
         gravity.enable()
         background.direction = 'up'
-        // background.speed     = 0.3
-    }, 0, 30);
+        
+    }, 0, 33);
+
+    soundHandler.schedule(() => {
+        var count = 0
+        var interval = setInterval(() => {
+            flash()
+            count += 1
+            if (count > 10) {clearInterval(interval)}
+        }, 100);
+    }, 0, 48.5)
+
+
+    soundHandler.schedule(() => {
+        if (background) {
+            background.speedup = true
+        }
+    }, 1, 6)
 
     soundHandler.schedule(() => {
         // console.log('change to transparent');
+        
         gravity.disable()
         gravity = null
         testTransparent();
-    }, 1, 9);
+        headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
+        headmove.enable(camera, face, mesh)
+    }, 1, 10);
 
     soundHandler.schedule(() => {
+        if (mouseLight) mouseLight.disable();
+
+        headmove.changeMode('shake', camera, face, mesh)
         // console.log('seperate mask and head?');
-    }, 1, 38);
+    }, 1, 40);
+
 
     soundHandler.schedule(() => {
-        console.log('???');
-    }, 1, 54);
+        headmove.changeMode('flake', camera, face, mesh)
+    }, 1, 55);
+
+    soundHandler.schedule(() => {
+        headmove.changeMode('up', camera, face, mesh)
+    }, 1, 57);
+
+    soundHandler.schedule(() => {
+        headmove.changeMode('shake', camera, face, mesh)
+    }, 2, 0);
+
+    soundHandler.schedule(() => {
+        headmove.changeMode('rotate', camera, face, mesh)
+    }, 2, 10);
+
+    soundHandler.schedule(() => {
+        directionalLight.intensity = 1
+        if (headmove) {
+            headmove.disable()
+            headmove = undefined
+        }
+        activity = new Activity(camera, scene, controls)
+        activity.enable()
+    }, 2, 12);
 }
 
 function init() {
@@ -411,10 +466,16 @@ function testSoft() {
     directionalLight.intensity = 0.5;
     if (!softVolume) {
         softVolume = new SoftVolume(scene, mesh, true, soundHandler);
-        let gui = new dat.GUI();
-        softVolume.setGUI(gui);
+        // let gui = new dat.GUI();
+        // softVolume.setGUI(gui);
     }
     softVolume.enable();
+}
+
+
+function flash () {
+    if (background) backgroundFlash('#343161')
+    else backgroundFlash('#457552')
 }
 
 

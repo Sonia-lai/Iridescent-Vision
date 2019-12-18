@@ -142,13 +142,13 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
 
         if (this.mode == 'idle') {
             controls.update();
-            if (controls.autoRotateSpeed < 20) controls.autoRotateSpeed += 0.1
-            if (directionalLight.intensity < 0.8) directionalLight.intensity += 0.001
+            // if (controls.autoRotateSpeed < 20) controls.autoRotateSpeed += 0.1
+            if (directionalLight.intensity < 0.8) directionalLight.intensity += 0.002
             console.log(directionalLight.intensity)
         } else if (this.mode == 'shake') {
             headShaking(deltaShake)
-            if (deltaShake < 5) {
-                deltaShake += 0.01
+            if (deltaShake < 4) {
+                deltaShake += 0.001
             }
         } else if (this.mode == 'flake') {
             maskFlaking(deltaFlake)
@@ -157,11 +157,11 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
                 removeModelByName('mask')
             }
             controls.update();
-            if (controls.autoRotateSpeed < 30) controls.autoRotateSpeed += 0.1
+            if (controls.autoRotateSpeed < 20) controls.autoRotateSpeed += 0.01
         } else if (this.mode == 'up') {
             removeModelByName('mask')
             faceRotate()
-            deltaRotate += 0.001
+            deltaRotate += 0.0005
         } else if (this.mode == 'rotate') {
             removeModelByName('mask')
             faceRotating()
@@ -172,11 +172,11 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         this.mode = mode
         if (mode == 'flake') {
             resetPos(camera, face, mesh)
-            this.controls.autoRotateSpeed = 2
+            this.controls.autoRotateSpeed = 0.5
         }
+        if (mode == 'shake') deltaShake = 1
         if (mode == 'idle') {
             this.controls.autoRotate = true
-            this.controls.enabled = true
         }
         if (mode == 'up' ) this.controls.autoRotate = false
         
@@ -188,11 +188,12 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         removeModelByName('mask')
         this.controls.autoRotate = false
         this.controls.enabled = false
-        this.controls.autoRotateSpeed = 2
+        this.controls.autoRotateSpeed = 0.5
     }
 
     this.enable = (camera, face, mesh) =>  {
         this.changeMode('idle')
+        this.controls.autoRotateSpeed = 0.5
         resetPos(camera, face, mesh)
     }
      

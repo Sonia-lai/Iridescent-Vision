@@ -13,7 +13,7 @@ var Gravity = function (scene, mesh, soundHandler) {
     const ROLL = 2;
 
     let world;
-    let size = 150;
+    let size = 120;
     this.uuid = []
     let bodys = [];
     let centerBody;
@@ -184,7 +184,6 @@ var Gravity = function (scene, mesh, soundHandler) {
             metalness: 0.28
 
         });
-        //specular: 0x441833,
 
         this.mesh.material = MeshMaterial;
 

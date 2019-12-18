@@ -27,7 +27,7 @@ var Background = function (renderer, scene) {
         }
 
         if (this.speedup) {
-            if (this.speed < 500) delta_speed += 0.001
+            if (this.speed < 500) delta_speed += 0.01
             else speedup = false
             this.speed += delta_speed
             
