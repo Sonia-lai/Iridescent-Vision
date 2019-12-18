@@ -1,3 +1,4 @@
+
 let TextLayer = function(startCallBack) {
 
     var divElement;
@@ -40,6 +41,20 @@ let TextLayer = function(startCallBack) {
     }
 
     let init = () => {
+        // Get HTML head element 
+        var head = document.getElementsByTagName('HEAD')[0];  
+        
+        // Create new link Element 
+        var link = document.createElement('link'); 
+
+        // set the attributes for link element  
+        link.rel = 'stylesheet';  
+        link.type = 'text/css'; 
+        link.href = 'https://fonts.googleapis.com/css?family=Dancing+Script:400,500,600,700&display=swap';  
+
+        // Append link element to HTML head 
+        head.appendChild(link);  
+
         divElement = document.createElement('div');
         divElement.style.cssText = `
             margin: 0 auto;
@@ -52,9 +67,7 @@ let TextLayer = function(startCallBack) {
             flex-direction: column;`;
         spanElement = document.createElement('span');
         spanElement.style.cssText = `
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-            "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-            sans-serif;
+            font-family: 'Dancing Script', cursive;
             margin: 1em;
             width: 80%;
             text-align: center;
@@ -64,6 +77,7 @@ let TextLayer = function(startCallBack) {
         spanElement.innerHTML='0%';
         btnElement = document.createElement('button');
         btnElement.style.cssText = `
+            font-family: 'Dancing Script', cursive;
             width: 7em;
             height: 3em;
             margin: 0;
@@ -76,7 +90,7 @@ let TextLayer = function(startCallBack) {
             background: transparent;
         `
         btnElement.onmouseover = function() {
-            this.style.backgroundColor = "rgba(255,255,255,0.4) ";
+            this.style.backgroundColor = "rgba(255,255,255,0.3)";
         }
         btnElement.onmouseout = function() {
             this.style.backgroundColor = "transparent";
