@@ -1,4 +1,3 @@
-import { SceneUtils, MeshStandardMaterial } from 'three/build/three.module';
 import * as THREE from 'three';
 import * as OIMO from 'oimo';
 import {Vec3} from 'oimo/src/math/Vec3';
@@ -18,10 +17,10 @@ var Gravity = function (scene, mesh) {
 
     }
 
-
+    let oriMaterial = mesh.material;
     let world;
     let bodys = [];
-    let size = 200;
+    let size = 150;
     this.uuid = []
 
     this.applyN = true;
@@ -82,8 +81,8 @@ var Gravity = function (scene, mesh) {
         let MeshMaterial = new THREE.MeshStandardMaterial({
             color: 0xffe6e6,
             side: THREE.DoubleSide,
-            alphaTest: 0.7,
-            shininess: 30 });
+            alphaTest: 0.7
+        });
 
         if (!noMesh) {
             
@@ -103,8 +102,7 @@ var Gravity = function (scene, mesh) {
         var force, m;
         var r = 3;
         let applyN = this.applyN
-        //let center = this.center
-        let center = new Vec3(pos.x, pos.y, pos.z);
+         let center = new Vec3(pos.x, pos.y, pos.z);
         let all    = this.all
 
         bodys.forEach(function (b, id) {
@@ -168,8 +166,11 @@ var Gravity = function (scene, mesh) {
 
     this.disable = () => {
         this.enabled = false
-        world.stop()
-
+        world.clear()
+        world = undefined
+        bodys = undefined
+        this.mesh.material =    oriMaterial;
+        oriMaterial = undefined
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
             if (!this.uuid.includes(obj.uuid)) {
@@ -177,10 +178,28 @@ var Gravity = function (scene, mesh) {
             }
 
         }
+
+        document.removeEventListener('click', applyForce, false);
+        document.removeEventListener('dblclick', applyAllForce, false)
     }
 
     function clearObject(obj, scene) {
         scene.remove(obj);
+
+
+        if (obj.material) {
+            if (obj.material.length) {
+                for (let i = 0; i < obj.material.length; ++i) {
+                    obj.material[i].dispose()
+                }
+            }
+            else {
+                obj.material.dispose()
+            }
+        }
+
+
+
         if (obj.geometry) {
             obj.geometry.dispose()
         }
@@ -188,8 +207,10 @@ var Gravity = function (scene, mesh) {
             Object.keys(obj.material).forEach(prop => {
                 if (!obj.material[prop])
                     return
-                if (typeof obj.material[prop].dispose === 'function')
+                if (typeof obj.material[prop].dispose === 'function'){
                     obj.material[prop].dispose()
+                }
+
             })
             obj.material.dispose()
         }
@@ -210,8 +231,6 @@ var Gravity = function (scene, mesh) {
         this.all    = true 
     }
 
-    document.addEventListener('click'   , applyForce, false);
-    document.addEventListener('dblclick', applyAllForce, false)
 
     init()
 }
