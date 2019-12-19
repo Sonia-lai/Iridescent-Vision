@@ -5,9 +5,10 @@ var Background = function (renderer, scene) {
     let Building = require('./background/building').default;
     let bldgs  = []
     let delta_speed = 0
-    let bldgColor = 0x8e57b5, lightColor = 0x444444, skyColor = 0x343161, recoverColor = 0xFFFFFF,
+    let bldgColor = 0x624eba, lightColor = 0x444444, skyColor = 0x343161, recoverColor = 0xFFFFFF,
         chunkSize = 120, chunksAtATime = 6, lgBldgSize = 12;
 
+    // bldgColor = 0x8e57b5
 
     this.speedup = false
     this.scene = scene;

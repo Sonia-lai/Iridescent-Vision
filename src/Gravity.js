@@ -175,7 +175,8 @@ var Gravity = function (scene, mesh, soundHandler) {
         var texture = textureLoader.load("https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png");
 
         let MeshMaterial = new THREE.MeshStandardMaterial({
-            color: 0xebaf09,
+            // color: 0xebaf09,
+            color: 0x6E7377,
             emissive: 0xc325e,
             map: texture,
             side: THREE.DoubleSide,

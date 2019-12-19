@@ -130,7 +130,7 @@ function initSound() {
             }, 200);
             speedupBg();
         //}, 0, 48.5)
-        }, 0, 50.5);
+        }, 0, 45);
     }
 
     let speedupBg = () => {
@@ -163,7 +163,7 @@ function initSound() {
     
             headmove.changeMode('shake', camera, face, mesh)
             // console.log('seperate mask and head?');
-        }, 1, 40);
+        }, 1, 38.5);
         headFlake();
     }
     
@@ -177,7 +177,7 @@ function initSound() {
     let headUp = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('up', camera, face, mesh)
-        }, 2, 0);
+        }, 1, 57);
         shakeHead2();
     }
 
@@ -273,7 +273,6 @@ function initModel() {
                 mesh = child;
                 mesh.name = 'mask'
                 scene.add(mesh);
-                console.log(mesh);
                 initMode();
             }
         })

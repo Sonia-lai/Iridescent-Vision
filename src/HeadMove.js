@@ -76,9 +76,9 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
     }
 
     let faceRotate = () => {
-        this.face.rotation.x += deltaRotate
-        this.face.rotation.y += deltaRotate
-        this.face.rotation.z += deltaRotate
+        this.face.rotation.x += deltaRotate * (Math.random() * 2 - 1)
+        this.face.rotation.y += deltaRotate * (Math.random() * 2 - 1)
+        this.face.rotation.z += deltaRotate * (Math.random() * 2 - 1)
     }
 
     let maskUp = () => {
@@ -147,8 +147,8 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             //console.log(directionalLight.intensity)
         } else if (this.mode == 'shake') {
             headShaking(deltaShake)
-            if (deltaShake < 4) {
-                deltaShake += 0.001
+            if (deltaShake < 10) {
+                deltaShake += 0.005
             }
         } else if (this.mode == 'flake') {
             maskFlaking(deltaFlake)
@@ -174,7 +174,6 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             resetPos(camera, face, mesh)
             this.controls.autoRotateSpeed = 0.5
         }
-        if (mode == 'shake') deltaShake = 1
         if (mode == 'idle') {
             this.controls.autoRotate = true
         }

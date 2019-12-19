@@ -28,10 +28,18 @@ export default class Building {
         var geometry = new THREE.TubeGeometry(path, 20, 0.5, 8, false);
         this.geo = geometry
         // this.geo = new THREE.CubeGeometry(width / 2, height / 2, depth);
-        this.mat = new THREE.MeshLambertMaterial({
-            color: bldgColor,
-        });
+        // this.mat = new THREE.MeshLambertMaterial({
+        //     color: bldgColor,
+        // });
 
+        this.mat = new THREE.MeshPhongMaterial({
+            color: 0x624eba,
+            emissive: 0xc325e,
+            specular: 0x441833,
+            side: THREE.DoubleSide,
+            alphaTest: 0.7,
+            shininess: 30
+        });
 
 
         let halfHeight = height / 2,
