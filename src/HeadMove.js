@@ -144,7 +144,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             controls.update();
             // if (controls.autoRotateSpeed < 20) controls.autoRotateSpeed += 0.1
             if (directionalLight.intensity < 0.8) directionalLight.intensity += 0.002
-            console.log(directionalLight.intensity)
+            //console.log(directionalLight.intensity)
         } else if (this.mode == 'shake') {
             headShaking(deltaShake)
             if (deltaShake < 4) {

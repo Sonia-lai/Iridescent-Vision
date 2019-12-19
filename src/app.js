@@ -44,30 +44,79 @@ function initSound() {
     soundHandler = new SoundHandler(soundOnProgress);
     //call soundHandler.play() when click?
     soundHandler.schedule(() => {
+        //soundHandler.consoleNow();
         //console.log('start');
         soundHandler.playBG();
         softVolume.enable();
         background.enable();
+        //soundHandler.consoleNow();
+        soft2Gravity();
     }, 0, 0);
     
-    soundHandler.schedule(() => {
-        var count = 0
-        var interval = setInterval(() => {
-            flash()
-            count += 1
-            if (count > 10) { clearInterval(interval) }
-        }, 100);
+    let soft2Gravity = () => {
+        soundHandler.scheduleToneTime(()=>{
+            //soundHandler.consoleNow();
+            //console.log('yo!');
+            //soundHandler.consoleNow();
+            var count = 0
+            //flash();
+            var interval = setInterval(() => {
+                flash();
+                count += 1
+                if (count > 10) { clearInterval(interval) }
+            }, 100);
 
-        if (softVolume) {
-            softVolume.disable();
-            softVolume.dispose();
-            softVolume = undefined;
-        }
-        //gravity = new Gravity(scene, mesh, soundHandler);
-        gravity.enable()
-        background.direction = 'up'
-        bumpFlash();
-    }, 0, 29);
+            if (softVolume) {
+                softVolume.disable();
+                softVolume.dispose();
+                softVolume = undefined;
+            }
+            //gravity = new Gravity(scene, mesh, soundHandler);
+            gravity.enable()
+            background.direction = 'up'
+            bumpFlash();
+        }, 29.5);
+    }
+    let soft2Gravity2 = () => {
+        soundHandler.schedule(()=>{
+            var count = 0
+            var interval = setInterval(() => {
+                flash()
+                count += 1
+                if (count > 5) { clearInterval(interval) }
+            }, 200);
+
+            if (softVolume) {
+                softVolume.disable();
+                softVolume.dispose();
+                softVolume = undefined;
+            }
+            //gravity = new Gravity(scene, mesh, soundHandler);
+            gravity.enable()
+            background.direction = 'up'
+            bumpFlash();
+        }, 0, 30);
+    }
+    //soundHandler.schedule(() => {
+        //soundHandler.consoleNow();
+        //alert();
+        // var count = 0
+        // var interval = setInterval(() => {
+        //     flash()
+        //     count += 1
+        //     if (count > 10) { clearInterval(interval) }
+        // }, 100);
+
+        // if (softVolume) {
+        //     softVolume.disable();
+        //     softVolume.dispose();
+        //     softVolume = undefined;
+        // }
+        // //gravity = new Gravity(scene, mesh, soundHandler);
+        // gravity.enable()
+        // background.direction = 'up'
+        // bumpFlash();
+    //}, 0, 29);
 
    // return;
     
@@ -77,8 +126,8 @@ function initSound() {
             var interval = setInterval(() => {
                 flash()
                 count += 1
-                if (count > 10) {clearInterval(interval)}
-            }, 100);
+                if (count > 5) {clearInterval(interval)}
+            }, 200);
             speedupBg();
         //}, 0, 48.5)
         }, 0, 50.5);
@@ -89,21 +138,22 @@ function initSound() {
             if (background) {
                 background.speedup = true
             }
+            
         //}, 1, 6)
-        }, 0, 60.5);
+        }, 1, 4);
         gravity2Glass();
     }
     
     let gravity2Glass = () => {
         soundHandler.schedule(() => {
-            // console.log('change to transparent');
+            //renderer.setClearColor('#000000');
             gravity.disable()
             gravity = null
-            testTransparent();
+            testTransparent(600);
             headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
             headmove.enable(camera, face, mesh)
         //}, 1, 10);
-        }, 1, 6.5);
+        }, 1, 8);
         shakeHead();
     }
     
@@ -460,29 +510,35 @@ function testOrigin() {
     if (softVolume) softVolume.disable();
 }
 
-function testTransparent() {
+function testTransparent(time) {
+    
     if (background) {
-        background.disable()
+        background.disable('#000000')
         background = undefined
     }
+    directionalLight.intensity = 0;
     // if (softVolume) softVolume.disable();
     //directionalLight.intensity = 1;
 
     //console.log(mesh, face);
-    if (!mouseLight)
-        mouseLight = new MouseLight(scene, camera, soundHandler);
-    mouseLight.enable();
 
     if (!glassSkin)
         glassSkin = new GlassSkin(scene, mesh);
-
-    const loader = new THREE.TextureLoader();
-    const bgTexture = loader.load(domeImage);
-    scene.background = bgTexture;
-
-    directionalLight.intensity = 0;
-    
     glassSkin.enable();
+
+    setTimeout(()=>{
+        if (!mouseLight)
+            mouseLight = new MouseLight(scene, camera, soundHandler);
+        mouseLight.enable();
+
+        const loader = new THREE.TextureLoader();
+        const bgTexture = loader.load(domeImage);
+        scene.background = bgTexture;
+        
+    }, time)
+    
+    
+    
 }
 
 function testSoft() {

@@ -34,15 +34,15 @@ var Background = function (renderer, scene) {
         }
     }
     
-    this.disable = () => {
+    this.disable = (color = new THREE.Color(recoverColor)) => {
         for (var i = this.scene.children.length - 1; i >= 0; i--) {
             let obj = this.scene.children[i]
             if (this.uuid.includes(obj.uuid)) {
                 clearObject(obj, this.scene)
             }
-
         }
-        renderer.setClearColor(new THREE.Color(recoverColor))
+       // console.log(color);
+        renderer.setClearColor(color)
         this.enabled = false
     }
 
