@@ -32,13 +32,12 @@
     "webfont": "^9.0.0",
     "webpack": "4.41.2",
     "webpack-cli": "3.3.10",
-    "webpack-dev-server": "3.9.0"
-  },
-  "dependencies": {
+    "webpack-dev-server": "3.9.0",
     "@babel/runtime": "^7.7.7",
     "body-scroll-lock": "^2.6.4",
     "dat.gui": "^0.7.6",
     "oimo": "^1.0.9",
     "tone": "^13.8.25"
-  }
+  },
+  "dependencies": {}
 }

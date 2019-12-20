@@ -7,7 +7,7 @@ export default class Building {
             THREE.Curve.call(this);
             this.type = x > -30 ? 1: 0; 
             this.scale = (scale === undefined) ? 1 : scale;
-
+            ``
         }
 
         CustomSinCurve.prototype = Object.create(THREE.Curve.prototype);
