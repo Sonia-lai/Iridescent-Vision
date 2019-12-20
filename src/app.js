@@ -177,7 +177,8 @@ function initSound() {
     let headUp = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('up', camera, face, mesh)
-        }, 1, 57);
+        }, 2, 0);
+        rotateHead();
         shakeHead2();
     }
 
@@ -237,7 +238,8 @@ function init() {
     initLight();
     
     initModel();
-    
+
+
 
     document.body.appendChild(renderer.domElement);
     //testEvent();
@@ -305,7 +307,7 @@ function animate() {
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
     if (gravity) gravity.update(mesh.position)
-    if (headmove) headmove.update(controls, directionalLight)
+    if (headmove) headmove.update(camera, face, controls, directionalLight)
     if (activity) activity.update(camera)
 
     renderer.render(scene, camera);
