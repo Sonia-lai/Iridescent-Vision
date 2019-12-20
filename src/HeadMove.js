@@ -15,9 +15,6 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
     this.renderer = renderer
     this.direction = 'up'   
 
- 
-
-
     let resetPos = (camera, face, mesh) => {
 
         this.controls.autoRotate = false

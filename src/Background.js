@@ -23,7 +23,7 @@ var Background = function (renderer, scene) {
         if (!this.enabled) return 
         backgroundUpdate(camera, mesh, face)
         if (this.scene.fog.far <= 720) {
-            if (scene.fog.far <= 100) this.scene.fog.far += 3
+            if (scene.fog.far <= 100) this.scene.fog.far += 0.5
             else this.scene.fog.far += 1
         }
 

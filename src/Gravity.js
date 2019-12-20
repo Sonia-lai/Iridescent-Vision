@@ -2,15 +2,16 @@ import * as THREE from 'three';
 import * as OIMO from 'oimo';
 import {Vec3} from 'oimo/src/math/Vec3';
 import ballCollide from './sounds/ball_collide.mp3';
-import ballFly from './sounds/ball_fly.mp3';
+import ballFly from './sounds/ball_fly2.mp3';
 import ballRoll from './sounds/ball_roll.mp3';
 
 
 var Gravity = function (scene, mesh, soundHandler) {
 
-    const COL = 0;
-    const FLY = 1;
-    const ROLL = 2;
+    const FLY = 0;
+    const ROLL = 1;
+    const COL = 2;
+    let colNum = 0;
 
     let world;
     let size = 80;
@@ -56,7 +57,24 @@ var Gravity = function (scene, mesh, soundHandler) {
     // }
 
     let initSound = () => {
-        player = soundHandler.loadPlayer([ballCollide, ballFly, ballRoll]);
+        player = soundHandler.loadPlayer([ballFly, ballRoll]);
+        player[ROLL].volume.value = 15;
+        let context = require.context('./sounds/collide/', true, /\.(mp3)$/);
+        let soundFiles=[];
+        context.keys().forEach((filename)=>{
+            soundFiles.push(context(filename));
+            colNum++;
+        });
+        let player1 = soundHandler.loadPlayer(soundFiles);
+        player1 = player1.concat(soundHandler.loadPlayer(soundFiles));
+        player1 = player1.concat(soundHandler.loadPlayer(soundFiles));
+        player1.forEach((p)=>{
+            p.volume.value = -5;
+        })
+        player = player.concat(player1);
+        colNum *= 3;
+        console.log('ggg', player.length)
+        console.log(colNum);
     }
     
     let initWorld = () => {
@@ -94,6 +112,7 @@ var Gravity = function (scene, mesh, soundHandler) {
 
         if (world) {
             var b = world.add(o);
+            if (!(b.userData)) b.userData = {};
             //bodys.push(b);
         }
 
@@ -104,10 +123,20 @@ var Gravity = function (scene, mesh, soundHandler) {
             s = new THREE.SphereGeometry(1, 32, 32);
         }
 
+        // let MeshMaterial = new THREE.MeshStandardMaterial({
+        //     color: 0x6b6b6b,
+        //     emissive: 0xb7adad,
+        //     roughness: 0,
+        //     metalness: 0
+        //     //alphaTest: 0.7
+        // });
         let MeshMaterial = new THREE.MeshStandardMaterial({
-            color: 0xffe6e6,
-            side: THREE.DoubleSide,
-            alphaTest: 0.7
+            // color: 0xebaf09,
+            color: 0xffffff,
+            emissive: 0xb7adad,
+            roughness: 0.5,
+            metalness: 1,
+
         });
 
         if (!noMesh) {
@@ -123,6 +152,7 @@ var Gravity = function (scene, mesh, soundHandler) {
 
     }
 
+    let nowDate;
     let postLoop = (pos) => {
         
         var force, m;
@@ -130,7 +160,7 @@ var Gravity = function (scene, mesh, soundHandler) {
         let applyN = this.applyN
         let center = new Vec3(pos.x, pos.y, pos.z);
         let all    = this.all
-
+        nowDate = new Date();
         bodys.forEach(function (b, id) {
             
             //console.log(b.userData.contact);
@@ -139,6 +169,7 @@ var Gravity = function (scene, mesh, soundHandler) {
                 m = b.mesh;
                 force = center.clone().sub(m.position).normalize().multiplyScalar(10);
                 if (applyN && (Math.floor(Math.random() * 4) || all)) {
+                    //b.userData.contact = false;
                     if (!all) force = force.negate().multiplyScalar(Math.random() * 50);
                     else force = force.negate().multiplyScalar(Math.random() * 70);
                 } 
@@ -155,33 +186,41 @@ var Gravity = function (scene, mesh, soundHandler) {
     let contact = (b) => {
 
         var c = world.getContact( centerBody, b);
-        //if (!(b.userData)) b.userData = {contact: false};
+        
         if( c ){ 
-            //b.userData.contact = true;
-            if( !c.close ) {
-                if (player[COL].state == 'stopped' && player[COL].loaded)
-                    player[COL].start();
+            if(!c.close) {
+                let rand = Math.floor(Math.random()*colNum);
+                let d = b.userData.contactD ? nowDate - b.userData.contactD : Infinity;
+                if (d > 200) {
+                    if (player[COL+rand].state == 'stopped' && player[COL+rand].loaded){
+                        player[COL+rand].start();
+                    //b.userData.contact = true;
+                    }  
+                }else {
+                    if (player[ROLL].state == 'stopped' && player[ROLL].loaded)
+                        player[ROLL].start();
+                }
+               
             } else {
                 if (player[ROLL].state == 'stopped' && player[ROLL].loaded)
                     player[ROLL].start();
             }
-        } 
+            b.userData.contactD = nowDate;
+        }
     
     }    
 
     
     let changeTexture = () => {
         var textureLoader = new THREE.TextureLoader();
-        var texture = textureLoader.load("https://raw.githubusercontent.com/aatishb/drape/master/textures/patterns/circuit_pattern.png");
 
-        let MeshMaterial = new THREE.MeshStandardMaterial({
+        let MeshMaterial = new THREE.MeshPhysicalMaterial({
             // color: 0xebaf09,
-            color: 0x6E7377,
-            emissive: 0xc325e,
-            map: texture,
-            side: THREE.DoubleSide,
-            roughness: 0.32,
-            metalness: 0.28
+            color: 0xffffff,
+            emissive: 0x353535,
+            roughness: 0.5,
+            metalness: 1,
+            reflectivity: 1
 
         });
 
@@ -220,8 +259,10 @@ var Gravity = function (scene, mesh, soundHandler) {
             if (this.uuid.includes(obj.uuid)) {
                 clearObject(obj, this.scene)
             }
-
         }
+        player.forEach((p)=>{
+            p.stop();
+        })
 
         document.removeEventListener('click', applyForce, false);
         document.removeEventListener('dblclick', applyAllForce, false)

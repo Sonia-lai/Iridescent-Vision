@@ -41,6 +41,9 @@ var MouseLight = function (scene, camera, soundHandler) {
 
     let initSound = () => {
         player = soundHandler.loadPlayer([light1, light2, light3], 1.5);
+        player.forEach((p)=>{
+            p.volume.value = -10;
+        })
     }
     
     // Follows the mouse event

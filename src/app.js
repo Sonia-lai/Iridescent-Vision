@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import GLTFLoader from 'three-gltf-loader';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+//import maskPath from './models/MaskOnly.gltf';
 import maskPath from './models/mask.gltf';
 import headPath from './models/Taj.gltf';
 import { MouseLight } from './MouseLight';
@@ -13,7 +14,8 @@ import * as dat from 'dat.gui';
 import { Gravity } from './Gravity'
 import { SoundHandler } from './SoundHandler';
 import {TextLayer} from './TextLayer';
-import domeImage from './images/gradient.jpeg'
+import domeImage from './images/gradient.jpeg';
+import faceTexture from './textures/TajSkin.png';
 
 var camera, scene, renderer;
 
@@ -35,7 +37,9 @@ var textLayer;
 var manager = new THREE.LoadingManager();
 var managerLoad = 0;
 var soundLoad = 0;
-var totalLoad = 16;
+var totalLoad = 25;
+
+var bgTexture;
 
 init();
 animate();
@@ -43,6 +47,7 @@ animate();
 function initSound() {
     soundHandler = new SoundHandler(soundOnProgress);
     //call soundHandler.play() when click?
+    //return;
     soundHandler.schedule(() => {
         //soundHandler.consoleNow();
         //console.log('start');
@@ -149,23 +154,41 @@ function initSound() {
             //renderer.setClearColor('#000000');
             gravity.disable()
             gravity = null
-            testTransparent(600);
+            testTransparent(2300);
             headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
             headmove.enable(camera, face, mesh)
         //}, 1, 10);
-        }, 1, 8);
+        }, 1, 5.5);
         shakeHead();
     }
     
     let shakeHead = () =>{
         soundHandler.schedule(() => {
             if (mouseLight) mouseLight.disable();
-    
+            flash(true);
+            var count = 0
+            var interval = setInterval(() => {
+                flash(true)
+                count += 1
+                if (count > 2) {clearInterval(interval)}
+            }, 1850);
+            const loader = new THREE.TextureLoader();
+            bgTexture = loader.load(domeImage);
+            scene.background = bgTexture;
+
             headmove.changeMode('shake', camera, face, mesh)
+            
             // console.log('seperate mask and head?');
-        }, 1, 38.5);
+        }, 1, 38.4);
+        //lash1();
         headFlake();
     }
+
+    // let flash1 = () => {
+    //     soundHandler.schedule(() => {
+    //         flash();
+    //     }, 1, 41);
+    // }
     
     let headFlake = () => {
         soundHandler.schedule(() => {
@@ -184,7 +207,7 @@ function initSound() {
     let shakeHead2 = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('shake', camera, face, mesh)
-        }, 2, 4.5);
+        }, 2, 5);
         rotateHead();
     }
 
@@ -240,7 +263,7 @@ function init() {
     
 
     document.body.appendChild(renderer.domElement);
-    //testEvent();
+    testEvent();
 }
 
 
@@ -283,7 +306,7 @@ function initModel() {
         face.position.set(2, 0, -15);
         face.scale.set(0.08, 0.08, 0.08);
         face.rotation.set(0, Math.PI, 0);
-        face.name = 'face'
+        face.name = 'face';
         scene.add(face);
     });
 
@@ -334,13 +357,14 @@ function animateValue(start, end, duration) {
 }
 
 function loadFinish() {
-    if (soundLoad + managerLoad !== totalLoad) return;
+    if (soundLoad + managerLoad < totalLoad) return;
     console.log('load finish!');
-    textLayer.addButton('CLICK TO START');
+    textLayer.addButton('CLICK');
 }
 
 function handleLoading() {
     let load = 100*(soundLoad+managerLoad)/totalLoad;
+    load = Math.min(load, 100);
     console.log('load:', soundLoad, managerLoad);
     clearInterval(loadingAnimateTimer);
     animateValue(parseInt(textLayer.nowInnerHtml().slice(0,-1)), load, 800);
@@ -369,21 +393,11 @@ function testEvent() {
     window.addEventListener('keydown', function (e) {
         var keyID = e.code;
         if (keyID === 'KeyA') {
-            console.log('now mesh:', mesh);
-            if (background) {
-                background.disable()
-                background = null
-            }
-            console.log('after disable bg mesh:', mesh);
-            if (softVolume) softVolume.disable();
-            console.log('after disable soft mesh:', mesh);
-            if (gravity) {
-                gravity.disable()
-                gravity = null
-            }
-            console.log('after disable gravity mesh:', mesh);
-            
-            testTransparent();
+            gravity.disable()
+            gravity = null
+            testTransparent(2300);
+            headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
+            headmove.enable(camera, face, mesh)
             e.preventDefault();
         }
         if (keyID == 'KeyB') {
@@ -421,16 +435,14 @@ function testEvent() {
         }
 
         if (keyID == 'KeyF') {
-            if (mouseLight) mouseLight.disable();
-            if (glassSkin) glassSkin.disable();
-            if (softVolume) softVolume.disable();
-            if (!gravity) {
-                gravity = new Gravity(scene, mesh, soundHandler);
-                gravity.enable()
-            } else {
-                gravity.disable()
-                gravity = undefined
+            if (softVolume) {
+                softVolume.disable();
+                softVolume.dispose();
+                softVolume = undefined;
             }
+            //gravity = new Gravity(scene, mesh, soundHandler);
+            gravity.enable()
+            background.direction = 'up'
             e.preventDefault();
         }
         if (keyID == 'KeyG') {
@@ -530,10 +542,10 @@ function testTransparent(time) {
             mouseLight = new MouseLight(scene, camera, soundHandler);
         mouseLight.enable();
 
-        const loader = new THREE.TextureLoader();
-        const bgTexture = loader.load(domeImage);
-        scene.background = bgTexture;
-        
+        //const loader = new THREE.TextureLoader();
+        //const bgTexture = loader.load(domeImage);
+        //scene.background = bgTexture;
+        renderer.setClearColor('#457552')
     }, time)
     
     
@@ -552,24 +564,35 @@ function testSoft() {
 }
 
 
-function flash () {
-    if (background) backgroundFlash('#343161')
-    else backgroundFlash('#457552')
+function flash (visible = false) {
+    console.log('flash', visible);
+    if (background) backgroundFlash('#343161', visible)
+    else backgroundFlash('#457552', visible)
 }
 
 
-function backgroundFlash(color) {
-    face.visible = false
-    mesh.visible = false
-    if (Math.floor(Math.random() * 2)) {
-        renderer.setClearColor('#17202A');
+function backgroundFlash(color, visible) {
+    face.visible = visible
+    mesh.visible = visible
+    if (!visible) {
+        if (Math.floor(Math.random() * 2)) {
+            renderer.setClearColor('#17202A');
+        } else {
+            renderer.setClearColor('#FFFFFF');
+        }
     } else {
+        scene.background = undefined;
+        console.log('white bg flash');
         renderer.setClearColor('#FFFFFF');
     }
-
     
     setTimeout(() => {
-        
+        console.log(visible);
+        if (visible) {
+            //const loader = new THREE.TextureLoader();
+            //const bgTexture = loader.load(domeImage);
+            scene.background = bgTexture;
+        }
         renderer.setClearColor(color);
         face.visible = true
         mesh.visible = true
