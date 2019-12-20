@@ -57,6 +57,7 @@ var MouseLight = function (scene, camera, soundHandler) {
 
 
     let onTouchMove = (event) => {
+        mouseMove = true;
         event.preventDefault();
         event.stopPropagation();
         mouse.x = (event.touches[ 0 ].pageX / window.innerWidth) * 2 - 1;
@@ -124,6 +125,7 @@ var MouseLight = function (scene, camera, soundHandler) {
         this.scene.remove(target);
         //light.dispose();
         //arget.dispose();
+        document.removeEventListener( 'touchmove', onTouchMove, false );
         document.removeEventListener( 'mousemove', onMouseMove, false );
     }
 

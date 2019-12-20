@@ -58,8 +58,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Iridescent-Vision',
-            filename: './index.html'
+            template: './index.html'
         })
     ]
 };

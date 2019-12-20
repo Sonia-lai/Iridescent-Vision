@@ -334,11 +334,13 @@ var Gravity = function (scene, mesh, soundHandler) {
     }
 
     let addListener = () => {
+        document.addEventListener( 'touchstart', applyForce, false );
         document.addEventListener('click'   , applyForce, false);
         document.addEventListener('dblclick', applyAllForce, false)
     }    
 
     let removeListener = () => {
+        document.removeEventListener( 'touchstart', applyForce, false );
         document.removeEventListener('click'   , applyForce, false);
         document.removeEventListener('dblclick', applyAllForce, false)
     }

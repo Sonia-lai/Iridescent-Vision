@@ -264,7 +264,7 @@ function init() {
 
 
     document.body.appendChild(renderer.domElement);
-    testEvent();
+    //testEvent();
 }
 
 
