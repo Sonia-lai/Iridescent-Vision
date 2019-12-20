@@ -37,7 +37,7 @@ var textLayer;
 var manager = new THREE.LoadingManager();
 var managerLoad = 0;
 var soundLoad = 0;
-var totalLoad = 25;
+var totalLoad = 25+20;
 
 var bgTexture;
 
@@ -365,7 +365,7 @@ function loadFinish() {
 function handleLoading() {
     let load = 100*(soundLoad+managerLoad)/totalLoad;
     load = Math.min(load, 100);
-    console.log('load:', soundLoad, managerLoad);
+    //console.log('load:', soundLoad, managerLoad);
     clearInterval(loadingAnimateTimer);
     animateValue(parseInt(textLayer.nowInnerHtml().slice(0,-1)), load, 800);
 }
@@ -565,7 +565,6 @@ function testSoft() {
 
 
 function flash (visible = false) {
-    console.log('flash', visible);
     if (background) backgroundFlash('#343161', visible)
     else backgroundFlash('#457552', visible)
 }
@@ -582,12 +581,10 @@ function backgroundFlash(color, visible) {
         }
     } else {
         scene.background = undefined;
-        console.log('white bg flash');
         renderer.setClearColor('#FFFFFF');
     }
     
     setTimeout(() => {
-        console.log(visible);
         if (visible) {
             //const loader = new THREE.TextureLoader();
             //const bgTexture = loader.load(domeImage);

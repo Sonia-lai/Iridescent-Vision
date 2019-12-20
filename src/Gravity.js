@@ -73,8 +73,6 @@ var Gravity = function (scene, mesh, soundHandler) {
         })
         player = player.concat(player1);
         colNum *= 3;
-        console.log('ggg', player.length)
-        console.log(colNum);
     }
     
     let initWorld = () => {
