@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import GLTFLoader from 'three-gltf-loader';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-//import maskPath from './models/MaskOnly.gltf';
-import maskPath from './models/mask.gltf';
+import maskPath from './models/mask3.gltf';
+// import maskPath from './models/mask.gltf';
 import headPath from './models/Taj.gltf';
 import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
@@ -15,7 +15,6 @@ import { Gravity } from './Gravity'
 import { SoundHandler } from './SoundHandler';
 import {TextLayer} from './TextLayer';
 import domeImage from './images/gradient.jpeg';
-import faceTexture from './textures/TajSkin.png';
 
 var camera, scene, renderer;
 
@@ -249,7 +248,7 @@ function init() {
     renderer.setClearColor('#FFFFFF');
 
     controls = new OrbitControls(camera, renderer.domElement)
-    controls.enable = false;
+    controls.enable = true;
     //testBackground();
     background = new Background(renderer, scene);
 
@@ -289,22 +288,25 @@ function initModel() {
         let model = gltf.scene
         model.traverse(child => {
             if (child.isMesh) {
-                child.geometry.rotateY(1.7);
-                child.geometry.scale(0.1, 0.1, 0.1)
-                child.geometry.translate(0, -30, 0)
+                child.geometry.rotateY(2 * Math.PI);
+                child.geometry.scale(0.15, 0.15, 0.15)
+                child.geometry.translate(0, -5, 0)
                 child.geometry.computeVertexNormals();
                 mesh = child;
                 mesh.name = 'mask'
                 scene.add(mesh);
                 initMode();
+                console.log('mesh')
+                console.log(mesh.position)
             }
         })
+
     });
 
     loader.load(headPath, gltf => {
         face = gltf.scene;
-        face.position.set(2, 0, -15);
-        face.scale.set(0.08, 0.08, 0.08);
+        face.position.set(1, 0, -25);
+        face.scale.set(0.1, 0.1, 0.1);
         face.rotation.set(0, Math.PI, 0);
         face.name = 'face';
         scene.add(face);

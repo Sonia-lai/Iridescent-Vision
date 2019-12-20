@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { DirectionalLight } from 'three/build/three.module';
 
 
 var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
