@@ -237,13 +237,12 @@ function initSound() {
 function init() {
     let width = window.innerWidth
     let height = window.innerHeight
-    intDocument();
     
     
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-    camera.position.set(0, 10, 40);
+    camera.position.set(0, 10, 50);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setClearColor('#FFFFFF');
@@ -264,14 +263,21 @@ function init() {
 
 
     document.body.appendChild(renderer.domElement);
+    initDocument()
     //testEvent();
 }
 
 
 
-function intDocument () {
+function initDocument () {
     document.querySelector('body').style.margin = "0px"; 
+    document.querySelector('body').style.height = "100%"; 
+
+    // document.querySelector('canvas').style.width = "100%"; 
+    // document.querySelector('canvas').style.height = "100%"; 
+    // document.querySelector('canvas').style.display = "block"; 
 }
+
 
 
 
@@ -306,7 +312,7 @@ function initModel() {
     loader.load(headPath, gltf => {
         face = gltf.scene;
         face.position.set(1, 0, -25);
-        face.scale.set(0.1, 0.1, 0.1);
+        face.scale.set(0.09, 0.09, 0.09);
         face.rotation.set(0, Math.PI, 0);
         face.name = 'face';
         scene.add(face);
@@ -330,7 +336,7 @@ function animate() {
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
     if (gravity) gravity.update(mesh.position)
-    if (headmove) headmove.update(camera, face, controls, directionalLight)
+    if (headmove) headmove.update(face, mesh, controls, directionalLight)
     if (activity) activity.update(camera)
 
     renderer.render(scene, camera);
@@ -605,3 +611,4 @@ window.onresize = function () {
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
 }
+

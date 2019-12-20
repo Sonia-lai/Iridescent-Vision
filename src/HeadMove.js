@@ -14,18 +14,20 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
     this.renderer = renderer
     this.direction = 'up'   
 
+
+
     let resetPos = (camera, face, mesh) => {
 
         this.controls.autoRotate = false
 
-        camera.position.set(0, 10, 40);
+        camera.position.set(0, 10, 50);
 
         mesh.position.set(0, 0, 0)
         mesh.rotation.set(0, 0, 0)
 
-        face.position.set(1, 0, -25);
-        face.scale.set(0.1, 0.1, 0.1);
-        face.rotation.set(0, Math.PI, 0)
+        face.position.set(1, 0, -20);
+        face.scale.set(0.08, 0.08, 0.08);
+        face.rotation.set(0, Math.PI, 0);
     
 
 
@@ -36,7 +38,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
     let initRandomPoints = () => {
         for (var i = 0; i < 1000; i++) {
             randomPoints.push(
-                new THREE.Vector3(Math.random() * 30 - 15, Math.random() * 30 - 15, Math.random() * 30 - 15)
+                new THREE.Vector3(Math.random() * 30 - 15, Math.random() * 30 - 10, Math.random() * 30 - 15)
             );
         }
         spline = new THREE.SplineCurve3(randomPoints);
@@ -54,7 +56,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         model.lookAt(spline.getPoint((index + 1) / 10000));
     }
 
-    let headShaking = (delta) => {
+    let headShaking = (face, mesh, delta) => {
         controls.autoRotate = false
         camPosIndex += Math.floor(delta);
         if (camPosIndex > 10000) camPosIndex = 0;
@@ -62,8 +64,8 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         var camPos = spline.getPoint(camPosIndex / 10000);
         var camRot = spline.getTangent(camPosIndex / 10000);
 
-        setPos(this.face, camPos, camRot, camPosIndex)
-        setPos(this.mesh, camPos, camRot, camPosIndex)
+        setPos(face, camPos, camRot, camPosIndex)
+        setPos(mesh, camPos, camRot, camPosIndex)
     }
 
     let maskFlaking = (delta) => {
@@ -134,7 +136,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         }
     }
 
-    this.update = (camera, face ,controls, directionalLight) => {
+    this.update = (face, mesh ,controls, directionalLight) => {
 
         if (this.mode == 'idle') {
             controls.update();
@@ -142,13 +144,14 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             if (directionalLight.intensity < 0.8) directionalLight.intensity += 0.002
             //console.log(directionalLight.intensity)
         } else if (this.mode == 'shake') {
-            headShaking(deltaShake)
+            console.log('shake')
+            headShaking(face, mesh, deltaShake)
             if (deltaShake < 10) {
-                deltaShake += 0.005
+                deltaShake += 0.003
             }
         } else if (this.mode == 'flake') {
             maskFlaking(deltaFlake)
-            if (controls.getAzimuthalAngle() < -0.1) {
+            if (controls.getAzimuthalAngle() < -0.15) {
                 deltaFlake += 0.01  
             } else {
                 deltaFlake += 0.001
@@ -159,7 +162,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
                 removeModelByName('mask')
             }
             controls.update();
-            if (controls.autoRotateSpeed < 10) controls.autoRotateSpeed += 0.005
+            if (controls.autoRotateSpeed < 10) controls.autoRotateSpeed += 0.001
         } else if (this.mode == 'up') {
             removeModelByName('mask')
             faceRotate()
@@ -174,9 +177,10 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         this.mode = mode
         if (mode == 'flake') {
             resetPos(camera, face, mesh)
-            this.controls.autoRotateSpeed = 0.5
+            this.controls.autoRotateSpeed = 1
             
         }
+
         if (mode == 'idle') {
             this.controls.autoRotate = true
         }
@@ -190,12 +194,12 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         removeModelByName('mask')
         this.controls.autoRotate = false
         this.controls.enabled = false
-        this.controls.autoRotateSpeed = 0.5
+        this.controls.autoRotateSpeed = 0.1
     }
 
     this.enable = (camera, face, mesh) =>  {
         this.changeMode('idle')
-        this.controls.autoRotateSpeed = 0.5
+        this.controls.autoRotateSpeed = 0.1
         resetPos(camera, face, mesh)
     }
      

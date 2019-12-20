@@ -12,7 +12,7 @@ var Gravity = function (scene, mesh, soundHandler) {
     const ROLL = 1;
     const COL = 2;
     let colNum = 0;
-    let count = 0
+    let delta = 1
     let world;
     let size = 80;
     this.uuid = []
@@ -91,9 +91,9 @@ var Gravity = function (scene, mesh, soundHandler) {
             move: true,
             density: 1,
             pos: [
-                rand(10, 100) * (randInt(0, 1) ? -1 : 1),
-                rand(10, 500) * (randInt(0, 1) ? -1 : 1),
-                rand(10, 100) * (randInt(0, 1) ? -1 : 1),
+                rand(10, 50)  * (randInt(0, 1) ? -1 : 1),
+                rand(10, 50)  * (randInt(0, 1) ? -1 : 1),
+                rand(10, 30)  * (randInt(0, 1) ? -1 : 1),
             ],
             rot: [
                 randInt(0, 360),
@@ -144,7 +144,6 @@ var Gravity = function (scene, mesh, soundHandler) {
 
     let nowDate;
     let postLoop = (pos) => {
-        count += 1
         var force, m;
         var r = 3;
         let applyN = this.applyN
@@ -157,10 +156,11 @@ var Gravity = function (scene, mesh, soundHandler) {
             if (b.type === 1) {
                 contact(b);
                 m = b.mesh;
-                force = center.clone().sub(m.position).normalize().multiplyScalar(10);
+                force = center.clone().sub(m.position).normalize().multiplyScalar(delta);
+                if (delta < 15) delta += 1
                 if (applyN && (Math.floor(Math.random() * 4) || all)) {
                     //b.userData.contact = false;
-                    if (!all) force = force.negate().multiplyScalar(Math.random() * 30 + 20);
+                    if (!all) force = force.negate().multiplyScalar(Math.random() * 10 + 20);
                     else force = force.negate().multiplyScalar(Math.random() * 40 + 30);
                 } 
                 b.applyImpulse(center, force);

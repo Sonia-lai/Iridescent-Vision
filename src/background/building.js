@@ -2,19 +2,19 @@ import * as THREE from 'three';
 import { throws } from 'assert';
 
 export default class Building {
-    constructor(x, y, z, width, height, depth, bldgColor, rotX = 0, rotY = 0, rotZ = 0) {
+    constructor(x, y, z, height, rotX = 0, rotY = 0, rotZ = 0) {
         function CustomSinCurve(scale) {
             THREE.Curve.call(this);
             this.type = x > -30 ? 1: 0; 
             this.scale = (scale === undefined) ? 1 : scale;
-            ``
+            
         }
 
         CustomSinCurve.prototype = Object.create(THREE.Curve.prototype);
         CustomSinCurve.prototype.constructor = CustomSinCurve;
 
         CustomSinCurve.prototype.getPoint = function (t) {
-            if (this.type == 0) var tx = Math.cos(2 * Math.PI * t);
+            if (this.type == 1) var tx = Math.cos(2 * Math.PI * t);
             else var tx = Math.sin(2 * Math.PI * t);
         
             var ty = t * 10 - 1.5
