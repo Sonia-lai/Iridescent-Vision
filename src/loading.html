@@ -1,0 +1,201 @@
+<div class='loader'>
+</div>
+<div id='start'>
+    <!-- <span>CLICK</span> -->
+</div>
+<div id='chrome'>
+    <span>use Chrome for best experience</span>
+</div>
+<style>
+
+#chrome {
+    margin: 0 auto;
+    position: absolute;
+    bottom: 10%;
+    left: 0;
+    font-size: 1em;
+    font-weight: 100;
+    color:rgba(255,255,255,0.5);
+    font-family: helvetica;
+    width: 80%;
+    left: 50%;
+    bottom: 20px;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+.loader {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border-radius: 50%;
+  
+}
+.loader:before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(transparent, rgba(255,255,255,0.5) 60%);
+  animation: spin 1.5s infinite linear;
+}
+.loader:after {
+  content: "";
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  top: 2.5%;
+  left: 2.5%;
+  border-radius: 50%;
+  background-color: rgba(53,50,97,1);
+}
+.fadeout, .fadeout:before{
+    animation: disappear 1s linear forwards;
+}
+
+.start {
+    z-index:11;
+    cursor: pointer; 
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    border-radius: 50%;
+    background-color: rgba(255,255,255,0.6);
+    box-shadow: 0 0 10px rgba(255,255,255,0.6);
+
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    animation: scaling 2s infinite ease, appear 1s linear;
+    -webkit-animation: scaling 2s infinite ease, appear 1s linear;
+}
+.start:after {
+    content: "";
+    position: absolute;
+    width: 95%;
+    height: 95%;
+    top: 2.5%;
+    left: 2.5%;
+    border-radius: 50%;
+    background-color: rgba(53,50,97,1);
+}
+.start:hover:after{
+    background-color: rgba(53,50,97,0.1);
+}
+
+#start span {
+    color: rgba(53,50,97,0.5);
+    font-family: helvetica;
+}
+/* 
+@media only screen and (max-width: 768px) {
+  #chrome {
+      font-size: 3em;
+  }
+} */
+
+
+@-webkit-keyframes appear {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+@-moz-keyframes appear {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+@keyframes appear {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+
+@-webkit-keyframes disappear {
+    to {opacity:0;}
+}
+@-moz-keyframes disappear {
+    to {opacity:0;}
+}
+@keyframes disappear {
+    to {opacity:0;}
+}
+
+@-webkit-keyframes scaling {
+    0% {
+        transform: scale(1.0);
+    }
+    40% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.0);
+    }
+}
+@-moz-keyframes scaling {
+    0% {
+        transform: scale(1.0);
+    }
+    40% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.0);
+    }
+}
+@keyframes scaling {
+    0% {
+        transform: scale(1.0);
+    }
+    40% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1.0);
+    }
+}
+/* 
+@keyframes scaling2 {
+    0% {
+        transform: scale(1.0);
+    }
+    40% {
+        transform: scale(1.045);
+    }
+    100% {
+        transform: scale(1.0);
+    }
+} */
+
+@-webkit-keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@-moz-keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+</style>
