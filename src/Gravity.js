@@ -12,7 +12,7 @@ var Gravity = function (scene, mesh, soundHandler) {
     const ROLL = 1;
     const COL = 2;
     let colNum = 0;
-
+    let count = 0
     let world;
     let size = 80;
     this.uuid = []
@@ -121,15 +121,7 @@ var Gravity = function (scene, mesh, soundHandler) {
             s = new THREE.SphereGeometry(1, 32, 32);
         }
 
-        // let MeshMaterial = new THREE.MeshStandardMaterial({
-        //     color: 0x6b6b6b,
-        //     emissive: 0xb7adad,
-        //     roughness: 0,
-        //     metalness: 0
-        //     //alphaTest: 0.7
-        // });
         let MeshMaterial = new THREE.MeshStandardMaterial({
-            // color: 0xebaf09,
             color: 0xffffff,
             emissive: 0xb7adad,
             roughness: 0.5,
@@ -152,7 +144,7 @@ var Gravity = function (scene, mesh, soundHandler) {
 
     let nowDate;
     let postLoop = (pos) => {
-        
+        count += 1
         var force, m;
         var r = 3;
         let applyN = this.applyN
@@ -168,8 +160,8 @@ var Gravity = function (scene, mesh, soundHandler) {
                 force = center.clone().sub(m.position).normalize().multiplyScalar(10);
                 if (applyN && (Math.floor(Math.random() * 4) || all)) {
                     //b.userData.contact = false;
-                    if (!all) force = force.negate().multiplyScalar(Math.random() * 50);
-                    else force = force.negate().multiplyScalar(Math.random() * 70);
+                    if (!all) force = force.negate().multiplyScalar(Math.random() * 30 + 20);
+                    else force = force.negate().multiplyScalar(Math.random() * 40 + 30);
                 } 
                 b.applyImpulse(center, force);
 
@@ -200,8 +192,9 @@ var Gravity = function (scene, mesh, soundHandler) {
                 }
                
             } else {
-                if (player[ROLL].state == 'stopped' && player[ROLL].loaded)
+                if (player[ROLL].state == 'stopped' && player[ROLL].loaded){
                     player[ROLL].start();
+                }
             }
             b.userData.contactD = nowDate;
         }
@@ -210,8 +203,6 @@ var Gravity = function (scene, mesh, soundHandler) {
 
     
     let changeTexture = () => {
-        var textureLoader = new THREE.TextureLoader();
-
         let MeshMaterial = new THREE.MeshPhysicalMaterial({
             // color: 0xebaf09,
             color: 0xffffff,

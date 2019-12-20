@@ -23,12 +23,12 @@ var Background = function (renderer, scene) {
         if (!this.enabled) return 
         backgroundUpdate(camera, mesh, face)
         if (this.scene.fog.far <= 720) {
-            if (scene.fog.far <= 100) this.scene.fog.far += 0.5
-            else this.scene.fog.far += 1
+            if (scene.fog.far <= 100) this.scene.fog.far += 0.25
+            else this.scene.fog.far += 0.5
         }
 
         if (this.speedup) {
-            if (this.speed < 500) delta_speed += 0.01
+            if (this.speed < 500) delta_speed += 0.03
             else speedup = false
             this.speed += delta_speed
             

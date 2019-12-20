@@ -3,7 +3,7 @@ import * as THREE from 'three';
 
 var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
 
-    let randomPoints = [], camPosIndex = 0, spline, deltaRotate = 0.1, deltaFlake = 0.5, deltaShake = 1, deltaMove = 1;
+    let randomPoints = [], camPosIndex = 0, spline, deltaRotate = 0.1, deltaFlake = 0, deltaShake = 1, deltaMove = 1;
     let upper = 50, lower  = -50;
     this.mode = ''; 
     this.camera = camera
@@ -19,12 +19,12 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         this.controls.autoRotate = false
 
         camera.position.set(0, 10, 40);
-        
+
         mesh.position.set(0, 0, 0)
         mesh.rotation.set(0, 0, 0)
 
-        face.position.set(2, 0, -15);
-        face.scale.set(0.08, 0.08, 0.08);
+        face.position.set(1, 0, -25);
+        face.scale.set(0.1, 0.1, 0.1);
         face.rotation.set(0, Math.PI, 0)
     
 
@@ -134,7 +134,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         }
     }
 
-    this.update = (controls, directionalLight) => {
+    this.update = (camera, face ,controls, directionalLight) => {
 
         if (this.mode == 'idle') {
             controls.update();
@@ -148,12 +148,18 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
             }
         } else if (this.mode == 'flake') {
             maskFlaking(deltaFlake)
-            deltaFlake += 0.01
-            if (deltaFlake >= 1) {
+            if (controls.getAzimuthalAngle() < -0.1) {
+                deltaFlake += 0.01  
+            } else {
+                deltaFlake += 0.001
+            }
+
+               
+            if (deltaFlake >= 0.8) {
                 removeModelByName('mask')
             }
             controls.update();
-            if (controls.autoRotateSpeed < 20) controls.autoRotateSpeed += 0.01
+            if (controls.autoRotateSpeed < 10) controls.autoRotateSpeed += 0.005
         } else if (this.mode == 'up') {
             removeModelByName('mask')
             faceRotate()
@@ -169,6 +175,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         if (mode == 'flake') {
             resetPos(camera, face, mesh)
             this.controls.autoRotateSpeed = 0.5
+            
         }
         if (mode == 'idle') {
             this.controls.autoRotate = true
