@@ -235,6 +235,7 @@ function initSound() {
 }
 
 function init() {
+    disableZoom();
     let width = window.innerWidth
     let height = window.innerHeight
     
@@ -311,8 +312,8 @@ function initModel() {
 
     loader.load(headPath, gltf => {
         face = gltf.scene;
-        face.position.set(1, 0, -18);
-        face.scale.set(0.09, 0.09, 0.09);
+        face.position.set(1, -4, -18);
+        face.scale.set(0.1, 0.1, 0.1);
         face.rotation.set(0, Math.PI, 0);
         face.name = 'face';
         scene.add(face);
@@ -324,6 +325,8 @@ function initMode() {
     mouseLight = new MouseLight(scene, camera, soundHandler);
     gravity = new Gravity(scene, mesh, soundHandler);
     softVolume = new SoftVolume(scene, mesh, true, soundHandler);
+    // let gui = new dat.GUI();
+    // softVolume.setGUI(gui);
     //softVolume.enable();
     //gravity.enable();
 }
@@ -335,7 +338,7 @@ function animate() {
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
-    if (gravity) gravity.update(mesh.position)
+    if (gravity) gravity.update(face.position.clone().add(new THREE.Vector3(-2,0,23)));
     if (headmove) headmove.update(face, mesh, controls, directionalLight)
     if (activity) activity.update(camera)
     
@@ -626,9 +629,27 @@ function backgroundFlash(color, visible) {
 function onWindowResized( event ) {
     let w = window.innerWidth;
     let h = window.innerHeight;
-    console.log('on');
-    renderer.setSize( w, h );//呈現器改變介面大小
+    renderer.setSize( w, h );
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+
     //camera.projectionMatrix.makePerspective( 75, window.innerWidth /window.innerHeight, 0.1, 1000 ); //使用者更新投影矩陣 並依照數值改變整個場景物件大小
  }
+
+ function disableZoom() {
+    document.addEventListener('touchstart', (event) => {
+      if (event.touches.length > 1) {
+         event.preventDefault();
+      }
+    }, { passive: false });
+    
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (event) => {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+  
+  }

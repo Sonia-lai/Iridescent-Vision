@@ -25,8 +25,8 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
         mesh.position.set(0, 0, 0)
         mesh.rotation.set(0, 0, 0)
 
-        face.position.set(1, 0, -20);
-        face.scale.set(0.08, 0.08, 0.08);
+        face.position.set(1, -4, -18);
+        face.scale.set(0.1, 0.1, 0.1);
         face.rotation.set(0, Math.PI, 0);
     
 
@@ -199,7 +199,7 @@ var HeadMove = function (renderer, camera, scene, face, mesh, controls) {
 
     this.enable = (camera, face, mesh) =>  {
         this.changeMode('idle')
-        this.controls.autoRotateSpeed = 0.1
+        this.controls.autoRotateSpeed = 0.4
         resetPos(camera, face, mesh)
     }
      
