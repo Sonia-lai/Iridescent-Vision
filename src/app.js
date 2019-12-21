@@ -29,7 +29,7 @@ var directionalLight;
 // var raycaster = new THREE.Raycaster(), INTERSECTED;
 // var mouse = new THREE.Vector2();
 // var eventType, sphere;
-var loadingAnimateTimer;
+// var loadingAnimateTimer;
 var soundHandler;
 var textLayer;
 
@@ -257,13 +257,13 @@ function init() {
 
     handleManager();
     initLight();
-    
     initModel();
 
 
 
     document.body.appendChild(renderer.domElement);
     initDocument()
+    window.addEventListener( 'resize', onWindowResized, false );
     //testEvent();
 }
 
@@ -298,7 +298,7 @@ function initModel() {
             if (child.isMesh) {
                 child.geometry.rotateY(2 * Math.PI);
                 child.geometry.scale(0.15, 0.15, 0.15)
-                child.geometry.translate(0, -5, 0)
+                child.geometry.translate(0, -5, 7)
                 child.geometry.computeVertexNormals();
                 mesh = child;
                 mesh.name = 'mask'
@@ -311,7 +311,7 @@ function initModel() {
 
     loader.load(headPath, gltf => {
         face = gltf.scene;
-        face.position.set(1, 0, -25);
+        face.position.set(1, 0, -18);
         face.scale.set(0.09, 0.09, 0.09);
         face.rotation.set(0, Math.PI, 0);
         face.name = 'face';
@@ -338,48 +338,59 @@ function animate() {
     if (gravity) gravity.update(mesh.position)
     if (headmove) headmove.update(face, mesh, controls, directionalLight)
     if (activity) activity.update(camera)
-
+    
     renderer.render(scene, camera);
     //handleLoading();
+    
 
 }
 
+function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const pixelRatio = window.devicePixelRatio;
+    const width  = canvas.clientWidth  * pixelRatio | 0;
+    const height = canvas.clientHeight * pixelRatio | 0;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
 
-function animateValue(start, end, duration) {
-    var range = end - start;
-    if (range == 0) return;
-    var increment = 2;
-    var current = start+increment;
-    current = Math.min(current, end);
-    textLayer.changeText(current+'%');
-    var stepTime = Math.abs(Math.floor(duration / range));
-    loadingAnimateTimer = setInterval(function() {
-        current += increment;
-        current = Math.min(current, end);
-        textLayer.changeText(current.toFixed(0)+'%');
-        if (current == end) {
-            loadFinish();
-            clearInterval(loadingAnimateTimer);
-        }
-    }, stepTime);
-}
+// function animateValue(start, end, duration) {
+//     var range = end - start;
+//     if (range == 0) return;
+//     var increment = 2;
+//     var current = start+increment;
+//     current = Math.min(current, end);
+//     //textLayer.changeText(current+'%');
+//     var stepTime = Math.abs(Math.floor(duration / range));
+//     loadingAnimateTimer = setInterval(function() {
+//         current += increment;
+//         current = Math.min(current, end);
+//         //textLayer.changeText(current.toFixed(0)+'%');
+//         if (current == end) {
+//             loadFinish();
+//             clearInterval(loadingAnimateTimer);
+//         }
+//     }, stepTime);
+// }
 
-function loadFinish() {
-    if (soundLoad + managerLoad < totalLoad) return;
-    console.log('load finish!');
-    textLayer.addButton('CLICK');
-}
+// function loadFinish() {
+//     if (soundLoad + managerLoad < totalLoad) return;
+//     console.log('load finish!');
+//     textLayer.addButton('CLICK');
+// }
 
 function handleLoading() {
-    let load = 100*(soundLoad+managerLoad)/totalLoad;
-    load = Math.min(load, 100);
-    //console.log('load:', soundLoad, managerLoad);
-    clearInterval(loadingAnimateTimer);
-    animateValue(parseInt(textLayer.nowInnerHtml().slice(0,-1)), load, 800);
+    if (soundLoad + managerLoad < totalLoad) return;
+    textLayer.addButton('CLICK');
 }
 
 function soundOnProgress(l) {
     soundLoad = l;
+    //console.log(soundLoad, managerLoad);
+    
     handleLoading();
 }
 
@@ -604,11 +615,20 @@ function backgroundFlash(color, visible) {
     }, 100);
 }
 
-window.onresize = function () {
+// window.onresize = function () {
+//     let w = window.innerWidth;
+//     let h = window.innerHeight;
+//     camera.aspect = w / h;
+//     camera.updateProjectionMatrix();
+//     renderer.setSize(w, h);
+// }
+
+function onWindowResized( event ) {
     let w = window.innerWidth;
     let h = window.innerHeight;
+    console.log('on');
+    renderer.setSize( w, h );//呈現器改變介面大小
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
-}
-
+    //camera.projectionMatrix.makePerspective( 75, window.innerWidth /window.innerHeight, 0.1, 1000 ); //使用者更新投影矩陣 並依照數值改變整個場景物件大小
+ }
