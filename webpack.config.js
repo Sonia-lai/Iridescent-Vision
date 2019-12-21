@@ -1,6 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require("path");
-
+//entry: "./src/app.js",
 module.exports = {
     entry: "./src/app.js",
     performance: {
@@ -49,14 +49,16 @@ module.exports = {
                 options: {
                     name: '[path][name].[ext]'
                 }
+            }, {
+                test: /\.html$/,
+                use: {loader: 'html-loader'}
             }
 
         ]
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Iridescent-Vision',
-            filename: 'index.html'
+            template: './index.html'
         })
     ]
 };

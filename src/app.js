@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import GLTFLoader from 'three-gltf-loader';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import maskPath from './models/mask.gltf';
+import maskPath from './models/mask3.gltf';
+// import maskPath from './models/mask.gltf';
 import headPath from './models/Taj.gltf';
 import { MouseLight } from './MouseLight';
 import { GlassSkin } from './GlassSkin';
@@ -13,7 +14,7 @@ import * as dat from 'dat.gui';
 import { Gravity } from './Gravity'
 import { SoundHandler } from './SoundHandler';
 import {TextLayer} from './TextLayer';
-import domeImage from './images/gradient.jpeg'
+import domeImage from './images/gradient.jpeg';
 
 var camera, scene, renderer;
 
@@ -28,14 +29,16 @@ var directionalLight;
 // var raycaster = new THREE.Raycaster(), INTERSECTED;
 // var mouse = new THREE.Vector2();
 // var eventType, sphere;
-var loadingAnimateTimer;
+// var loadingAnimateTimer;
 var soundHandler;
 var textLayer;
 
 var manager = new THREE.LoadingManager();
 var managerLoad = 0;
 var soundLoad = 0;
-var totalLoad = 16;
+var totalLoad = 25+20;
+
+var bgTexture;
 
 init();
 animate();
@@ -43,6 +46,7 @@ animate();
 function initSound() {
     soundHandler = new SoundHandler(soundOnProgress);
     //call soundHandler.play() when click?
+    //return;
     soundHandler.schedule(() => {
         //soundHandler.consoleNow();
         //console.log('start');
@@ -149,23 +153,41 @@ function initSound() {
             //renderer.setClearColor('#000000');
             gravity.disable()
             gravity = null
-            testTransparent(600);
+            testTransparent(2300);
             headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
             headmove.enable(camera, face, mesh)
         //}, 1, 10);
-        }, 1, 8);
+        }, 1, 5.5);
         shakeHead();
     }
     
     let shakeHead = () =>{
         soundHandler.schedule(() => {
             if (mouseLight) mouseLight.disable();
-    
+            flash(true);
+            var count = 0
+            var interval = setInterval(() => {
+                flash(true)
+                count += 1
+                if (count > 2) {clearInterval(interval)}
+            }, 1850);
+            const loader = new THREE.TextureLoader();
+            bgTexture = loader.load(domeImage);
+            scene.background = bgTexture;
+
             headmove.changeMode('shake', camera, face, mesh)
+            
             // console.log('seperate mask and head?');
-        }, 1, 38.5);
+        }, 1, 38.4);
+        //lash1();
         headFlake();
     }
+
+    // let flash1 = () => {
+    //     soundHandler.schedule(() => {
+    //         flash();
+    //     }, 1, 41);
+    // }
     
     let headFlake = () => {
         soundHandler.schedule(() => {
@@ -177,14 +199,15 @@ function initSound() {
     let headUp = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('up', camera, face, mesh)
-        }, 1, 57);
+        }, 2, 2);
+        rotateHead();
         shakeHead2();
     }
 
     let shakeHead2 = () => {
         soundHandler.schedule(() => {
             headmove.changeMode('shake', camera, face, mesh)
-        }, 2, 4.5);
+        }, 2, 5);
         rotateHead();
     }
 
@@ -212,21 +235,21 @@ function initSound() {
 }
 
 function init() {
+    disableZoom();
     let width = window.innerWidth
     let height = window.innerHeight
-    intDocument();
     
     
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
-    camera.position.set(0, 10, 40);
+    camera.position.set(0, 10, 50);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
     renderer.setClearColor('#FFFFFF');
 
     controls = new OrbitControls(camera, renderer.domElement)
-    controls.enable = false;
+    controls.enable = true;
     //testBackground();
     background = new Background(renderer, scene);
 
@@ -235,19 +258,27 @@ function init() {
 
     handleManager();
     initLight();
-    
     initModel();
-    
+
+
 
     document.body.appendChild(renderer.domElement);
+    initDocument()
+    window.addEventListener( 'resize', onWindowResized, false );
     //testEvent();
 }
 
 
 
-function intDocument () {
+function initDocument () {
     document.querySelector('body').style.margin = "0px"; 
+    document.querySelector('body').style.height = "100%"; 
+
+    // document.querySelector('canvas').style.width = "100%"; 
+    // document.querySelector('canvas').style.height = "100%"; 
+    // document.querySelector('canvas').style.display = "block"; 
 }
+
 
 
 
@@ -266,9 +297,9 @@ function initModel() {
         let model = gltf.scene
         model.traverse(child => {
             if (child.isMesh) {
-                child.geometry.rotateY(1.7);
-                child.geometry.scale(0.1, 0.1, 0.1)
-                child.geometry.translate(0, -30, 0)
+                child.geometry.rotateY(2 * Math.PI);
+                child.geometry.scale(0.15, 0.15, 0.15)
+                child.geometry.translate(0, -5, 7)
                 child.geometry.computeVertexNormals();
                 mesh = child;
                 mesh.name = 'mask'
@@ -276,14 +307,15 @@ function initModel() {
                 initMode();
             }
         })
+
     });
 
     loader.load(headPath, gltf => {
         face = gltf.scene;
-        face.position.set(2, 0, -15);
-        face.scale.set(0.08, 0.08, 0.08);
+        face.position.set(1, -4, -18);
+        face.scale.set(0.1, 0.1, 0.1);
         face.rotation.set(0, Math.PI, 0);
-        face.name = 'face'
+        face.name = 'face';
         scene.add(face);
     });
 
@@ -293,6 +325,8 @@ function initMode() {
     mouseLight = new MouseLight(scene, camera, soundHandler);
     gravity = new Gravity(scene, mesh, soundHandler);
     softVolume = new SoftVolume(scene, mesh, true, soundHandler);
+    // let gui = new dat.GUI();
+    // softVolume.setGUI(gui);
     //softVolume.enable();
     //gravity.enable();
 }
@@ -304,50 +338,62 @@ function animate() {
     if (glassSkin) glassSkin.update(renderer, camera);
     if (mouseLight) mouseLight.update(mesh);
     if (background) background.update(camera, mesh, face);
-    if (gravity) gravity.update(mesh.position)
-    if (headmove) headmove.update(controls, directionalLight)
+    if (gravity) gravity.update(face.position.clone().add(new THREE.Vector3(-2,0,23)));
+    if (headmove) headmove.update(face, mesh, controls, directionalLight)
     if (activity) activity.update(camera)
-
+    
     renderer.render(scene, camera);
     //handleLoading();
+    
 
 }
 
+function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const pixelRatio = window.devicePixelRatio;
+    const width  = canvas.clientWidth  * pixelRatio | 0;
+    const height = canvas.clientHeight * pixelRatio | 0;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
 
-function animateValue(start, end, duration) {
-    var range = end - start;
-    if (range == 0) return;
-    var increment = 2;
-    var current = start+increment;
-    current = Math.min(current, end);
-    textLayer.changeText(current+'%');
-    var stepTime = Math.abs(Math.floor(duration / range));
-    loadingAnimateTimer = setInterval(function() {
-        current += increment;
-        current = Math.min(current, end);
-        textLayer.changeText(current.toFixed(0)+'%');
-        if (current == end) {
-            loadFinish();
-            clearInterval(loadingAnimateTimer);
-        }
-    }, stepTime);
-}
+// function animateValue(start, end, duration) {
+//     var range = end - start;
+//     if (range == 0) return;
+//     var increment = 2;
+//     var current = start+increment;
+//     current = Math.min(current, end);
+//     //textLayer.changeText(current+'%');
+//     var stepTime = Math.abs(Math.floor(duration / range));
+//     loadingAnimateTimer = setInterval(function() {
+//         current += increment;
+//         current = Math.min(current, end);
+//         //textLayer.changeText(current.toFixed(0)+'%');
+//         if (current == end) {
+//             loadFinish();
+//             clearInterval(loadingAnimateTimer);
+//         }
+//     }, stepTime);
+// }
 
-function loadFinish() {
-    if (soundLoad + managerLoad !== totalLoad) return;
-    console.log('load finish!');
-    textLayer.addButton('CLICK TO START');
-}
+// function loadFinish() {
+//     if (soundLoad + managerLoad < totalLoad) return;
+//     console.log('load finish!');
+//     textLayer.addButton('CLICK');
+// }
 
 function handleLoading() {
-    let load = 100*(soundLoad+managerLoad)/totalLoad;
-    console.log('load:', soundLoad, managerLoad);
-    clearInterval(loadingAnimateTimer);
-    animateValue(parseInt(textLayer.nowInnerHtml().slice(0,-1)), load, 800);
+    if (soundLoad + managerLoad < totalLoad) return;
+    textLayer.addButton('CLICK');
 }
 
 function soundOnProgress(l) {
     soundLoad = l;
+    //console.log(soundLoad, managerLoad);
+    
     handleLoading();
 }
 
@@ -369,21 +415,11 @@ function testEvent() {
     window.addEventListener('keydown', function (e) {
         var keyID = e.code;
         if (keyID === 'KeyA') {
-            console.log('now mesh:', mesh);
-            if (background) {
-                background.disable()
-                background = null
-            }
-            console.log('after disable bg mesh:', mesh);
-            if (softVolume) softVolume.disable();
-            console.log('after disable soft mesh:', mesh);
-            if (gravity) {
-                gravity.disable()
-                gravity = null
-            }
-            console.log('after disable gravity mesh:', mesh);
-            
-            testTransparent();
+            gravity.disable()
+            gravity = null
+            testTransparent(2300);
+            headmove = new HeadMove(renderer, camera, scene, face, mesh, controls)
+            headmove.enable(camera, face, mesh)
             e.preventDefault();
         }
         if (keyID == 'KeyB') {
@@ -421,16 +457,14 @@ function testEvent() {
         }
 
         if (keyID == 'KeyF') {
-            if (mouseLight) mouseLight.disable();
-            if (glassSkin) glassSkin.disable();
-            if (softVolume) softVolume.disable();
-            if (!gravity) {
-                gravity = new Gravity(scene, mesh, soundHandler);
-                gravity.enable()
-            } else {
-                gravity.disable()
-                gravity = undefined
+            if (softVolume) {
+                softVolume.disable();
+                softVolume.dispose();
+                softVolume = undefined;
             }
+            //gravity = new Gravity(scene, mesh, soundHandler);
+            gravity.enable()
+            background.direction = 'up'
             e.preventDefault();
         }
         if (keyID == 'KeyG') {
@@ -530,10 +564,10 @@ function testTransparent(time) {
             mouseLight = new MouseLight(scene, camera, soundHandler);
         mouseLight.enable();
 
-        const loader = new THREE.TextureLoader();
-        const bgTexture = loader.load(domeImage);
-        scene.background = bgTexture;
-        
+        //const loader = new THREE.TextureLoader();
+        //const bgTexture = loader.load(domeImage);
+        //scene.background = bgTexture;
+        renderer.setClearColor('#457552')
     }, time)
     
     
@@ -552,34 +586,70 @@ function testSoft() {
 }
 
 
-function flash () {
-    if (background) backgroundFlash('#343161')
-    else backgroundFlash('#457552')
+function flash (visible = false) {
+    if (background) backgroundFlash('#343161', visible)
+    else backgroundFlash('#457552', visible)
 }
 
 
-function backgroundFlash(color) {
-    face.visible = false
-    mesh.visible = false
-    if (Math.floor(Math.random() * 2)) {
-        renderer.setClearColor('#17202A');
+function backgroundFlash(color, visible) {
+    face.visible = visible
+    mesh.visible = visible
+    if (!visible) {
+        if (Math.floor(Math.random() * 2)) {
+            renderer.setClearColor('#17202A');
+        } else {
+            renderer.setClearColor('#FFFFFF');
+        }
     } else {
+        scene.background = undefined;
         renderer.setClearColor('#FFFFFF');
     }
-
     
     setTimeout(() => {
-        
+        if (visible) {
+            //const loader = new THREE.TextureLoader();
+            //const bgTexture = loader.load(domeImage);
+            scene.background = bgTexture;
+        }
         renderer.setClearColor(color);
         face.visible = true
         mesh.visible = true
     }, 100);
 }
 
-window.onresize = function () {
+// window.onresize = function () {
+//     let w = window.innerWidth;
+//     let h = window.innerHeight;
+//     camera.aspect = w / h;
+//     camera.updateProjectionMatrix();
+//     renderer.setSize(w, h);
+// }
+
+function onWindowResized( event ) {
     let w = window.innerWidth;
     let h = window.innerHeight;
+    renderer.setSize( w, h );
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
-}
+
+    //camera.projectionMatrix.makePerspective( 75, window.innerWidth /window.innerHeight, 0.1, 1000 ); //使用者更新投影矩陣 並依照數值改變整個場景物件大小
+ }
+
+ function disableZoom() {
+    document.addEventListener('touchstart', (event) => {
+      if (event.touches.length > 1) {
+         event.preventDefault();
+      }
+    }, { passive: false });
+    
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (event) => {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+  
+  }

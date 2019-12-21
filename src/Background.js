@@ -6,7 +6,7 @@ var Background = function (renderer, scene) {
     let bldgs  = []
     let delta_speed = 0
     let bldgColor = 0x624eba, lightColor = 0x444444, skyColor = 0x343161, recoverColor = 0xFFFFFF,
-        chunkSize = 120, chunksAtATime = 6, lgBldgSize = 12;
+        chunkSize = 120, chunksAtATime = 6, lgBldgSize = 24;
 
     // bldgColor = 0x8e57b5
 
@@ -23,12 +23,12 @@ var Background = function (renderer, scene) {
         if (!this.enabled) return 
         backgroundUpdate(camera, mesh, face)
         if (this.scene.fog.far <= 720) {
-            if (scene.fog.far <= 100) this.scene.fog.far += 3
-            else this.scene.fog.far += 1
+            if (scene.fog.far <= 100) this.scene.fog.far += 0.3
+            else this.scene.fog.far += 0.5
         }
 
         if (this.speedup) {
-            if (this.speed < 500) delta_speed += 0.01
+            if (this.speed < 500) delta_speed += 0.03
             else speedup = false
             this.speed += delta_speed
             
@@ -92,10 +92,10 @@ var Background = function (renderer, scene) {
 
         for(var i = 0; i < 30; i++) {
             var x = Math.random() * 600 - 300
-            var y = Math.random() * 100 - 50
+            var y = Math.random() * 100 - 300
             var z = Math.random() * 100 - 50
-            var d = Math.random() * 20  + 30
-            buildings.push(new Building(x, y, z + zMove, lgBldgSize, d, lgBldgSize, bldgColor))
+            var d = Math.random() * 20  + 60
+            buildings.push(new Building(x, y, z + zMove, d))
         }
         return buildings
 

@@ -22,7 +22,7 @@ var SoftVolume = function(scene, mesh, isGltf, soundHandler) {
     this.effectRange = 25; //2.5
     this.depressRate = 0.4; //4
     
-    this.pullTo = -2;
+    this.pullTo = -10;
     this.constraintTime = 2;
     this.timeoutms = 2500;
     this.soundHandler = soundHandler;

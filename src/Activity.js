@@ -75,6 +75,7 @@ var Activity = function (camera, scene, controls) {
     this.init = () => {
         initButton()
         initBackground()
+        // window.addEventListener('touchstart', clickMouse, false);
         window.addEventListener('mousemove', onMouseMove, false);
         window.addEventListener('click'    , clickMouse, false)
     }
